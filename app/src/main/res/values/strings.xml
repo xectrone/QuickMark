@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">QuickMark</string>
+    <string name="add_note_intent">ADD_NEW_NOTE_DIALOG</string>
 </resources>

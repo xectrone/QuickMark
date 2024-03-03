@@ -91,5 +91,10 @@ dependencies {
 
     // Permissions
     implementation "com.google.accompanist:accompanist-permissions:0.30.0"
+//
+//    //Glance
+//    implementation "androidx.glance:glance:1.0.0-beta01"
+//    implementation "androidx.glance:glance-appwidget:1.0.0-beta01"
+
 
 }

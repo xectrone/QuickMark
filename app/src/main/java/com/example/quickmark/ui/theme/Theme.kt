@@ -18,6 +18,11 @@ private val LightColorPalette = lightColors(
     secondary = Color(0xFF03A9F4),
     secondaryVariant = Color(0xFF757575),
 
+    surface = Color(0xFFF2F3F7)
+
+
+
+
 
 
 
@@ -35,13 +40,16 @@ private val DarkColorPalette = darkColors(
     secondary = Color(0xFF03A9F4),
     secondaryVariant = Color(0xFF757575),
 
+    surface = Color(0xFF131313),
+
+
 
 
 
     )
 
 @Composable
-fun AppNameTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+fun QuickMarkTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colors = if (darkTheme) {
         DarkColorPalette
     } else {

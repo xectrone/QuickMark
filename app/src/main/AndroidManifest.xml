@@ -21,12 +21,54 @@
             android:theme="@style/Theme.QuickMark">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.add_note_dialog.AddNoteActivity"
+            android:exported="true"
+            android:label="Add Note Activity"
+            android:theme="@style/Theme.TransparentActivity">
+            <intent-filter>
+                <action android:name="@string/add_note_intent"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+
+
+        <receiver android:name=".ui.add_note_dialog.WidgetClickListener"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.myapplication.WIDGET_ACTION_CLICK" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".ui.add_note_dialog.MyAppWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/add_note_widget_provider" />
+        </receiver>
+
+        <service
+            android:name=".ui.add_note_dialog.NewMarkdownFileDialogTileService"
+            android:label="NewMarkdownFileDialogTile"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+
     </application>
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+
 </manifest>
