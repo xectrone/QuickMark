@@ -1,17 +1,12 @@
-package com.example.quickmark.ui.add_note_dialog
+package com.example.quickmark.ui.add_note_dialog.add_note_dialog_tile
 
-import android.app.PendingIntent
-import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetProvider
-import android.content.Context
 import android.content.Intent
-import android.widget.RemoteViews
-import com.example.quickmark.R
 
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import com.example.quickmark.ui.add_note_dialog.AddNoteActivity
 
-class NewMarkdownFileDialogTileService : TileService() {
+class AddNoteDialogService : TileService() {
     override fun onClick() {
         super.onClick()
         // Set up click action
@@ -23,7 +18,7 @@ class NewMarkdownFileDialogTileService : TileService() {
     override fun onStartListening() {
         super.onStartListening()
         // Set up tile appearance
-        qsTile.state = Tile.STATE_ACTIVE
+        qsTile.state = Tile.STATE_INACTIVE
         qsTile.updateTile()
     }
 

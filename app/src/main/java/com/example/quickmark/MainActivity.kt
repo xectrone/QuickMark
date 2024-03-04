@@ -10,18 +10,35 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.example.flashup.ui.theme.QuickMarkTheme
+import com.example.quickmark.data.datastore.DataStoreManager
 import com.example.quickmark.domain.navigation.HomeScreenNavGraph
+import com.example.quickmark.ui.settings_screen.SimpleScreen
 import com.example.quickmark.ui.add_note_dialog.AddNoteActivity
-import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val directoryPathManager by lazy { DataStoreManager(applicationContext) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val chooseDirectoryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val directoryPath = result.data?.getStringExtra("directory_path")
+                if (!directoryPath.isNullOrEmpty()) {
+                    lifecycleScope.launch {
+                        directoryPathManager.saveDirectoryPath(directoryPath)
+                    }
+                }
+            }
+        }
+
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             QuickMarkTheme {
@@ -51,11 +68,11 @@ class MainActivity : ComponentActivity() {
                 return
             }
         }
-
-        // Request to pin the shortcut
         shortcutManager.requestPinShortcut(shortcutInfo, null)
     }
 }
+
+
 
 
 

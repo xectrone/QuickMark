@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     >
     <application
-        android:name=".data.hilt.QuickMark"
+        android:name=".data.QuickMark"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -11,14 +11,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.QuickMark"
+        android:theme="@style/SplashScreen"
         tools:targetApi="31"
         >
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.QuickMark">
+            android:theme="@style/SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -37,14 +37,15 @@
 
 
 
-        <receiver android:name=".ui.add_note_dialog.WidgetClickListener"
+
+        <receiver android:name=".ui.add_note_dialog.add_note_dialog_widget.AddNoteWidgetClickListener"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.example.myapplication.WIDGET_ACTION_CLICK" />
+                <action android:name="@string/add_note_widget_click_intent"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".ui.add_note_dialog.MyAppWidgetProvider"
+        <receiver android:name=".ui.add_note_dialog.add_note_dialog_widget.QuickMarkWidgetProvider"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -55,7 +56,7 @@
         </receiver>
 
         <service
-            android:name=".ui.add_note_dialog.NewMarkdownFileDialogTileService"
+            android:name=".ui.add_note_dialog.add_note_dialog_tile.AddNoteDialogService"
             android:label="NewMarkdownFileDialogTile"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:exported="true">

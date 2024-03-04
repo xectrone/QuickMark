@@ -1,6 +1,5 @@
-package com.example.quickmark.ui.add_note_dialog
+package com.example.quickmark.ui.add_note_dialog.add_note_dialog
 
-import android.app.Dialog
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -14,18 +13,15 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.encrypsy.ui.theme.Dimen
 import com.example.quickmark.domain.file_handling.FileHelper
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterialApi::class)
+
 @Composable
 fun AddNoteDialog(
     finish: () -> Unit
 ) {
     val fileHelper = FileHelper("/storage/emulated/0/0.MEDIA/qn")
-    val dismissState = rememberDismissState()
-    val scope = rememberCoroutineScope()
 
     val textFieldColor = TextFieldDefaults.textFieldColors(
         textColor = MaterialTheme.colors.primary,
@@ -54,7 +50,7 @@ fun AddNoteDialog(
             color = MaterialTheme.colors.surface
 
         ) {
-            var title by remember { mutableStateOf(SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault()).format(Date())) }
+            var title by remember { mutableStateOf(SimpleDateFormat("yyyy-MM-dd HH-mm-ss", Locale.getDefault()).format(Date())) }
             var content by remember { mutableStateOf("")}
 
             Column(

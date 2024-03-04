@@ -14,28 +14,25 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.quickmark.ui.theme.Constants
 import com.example.encrypsy.ui.theme.Dimen
 import com.example.quickmark.domain.file_handling.FileHelper
 import com.example.quickmark.ui.add_note_dialog.AddNoteActivity
-import com.example.quickmark.ui.add_note_dialog.AddNoteDialog
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
-@OptIn(ExperimentalPermissionsApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     navController: NavHostController
 ) {
+    val markdownFiles by viewModel.markdownFiles.collectAsState(emptyList())
     val fileHelper = FileHelper("/storage/emulated/0/0.MEDIA/qn")
     var showDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -66,7 +63,7 @@ fun HomeScreen(
     {
         LazyColumn{
             //region - Flashcard List View -
-            items(fileList)
+            items(markdownFiles.sortedByDescending { it.lastModified() })
             {
                 NoteListItem(
                     item = NoteSelectionListItem(it,false),

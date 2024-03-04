@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">QuickMark</string>
     <string name="add_note_intent">ADD_NEW_NOTE_DIALOG</string>
+    <string name="add_note_widget_click_intent">ADD_NOTE_WIDGET_CLICK</string>
 </resources>
