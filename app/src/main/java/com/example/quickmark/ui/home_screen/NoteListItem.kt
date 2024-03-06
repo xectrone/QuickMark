@@ -7,12 +7,16 @@ import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.ui.Alignment
+import com.example.quickmark.ui.theme.Dimen
+import com.example.quickmark.data.AppConverters
+import com.example.quickmark.ui.theme.CustomTypography
+import com.example.quickmark.ui.theme.LocalCustomColorPalette
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -26,35 +30,45 @@ fun NoteListItem(item: NoteSelectionListItem, onClick:()->Unit, onLongClick:()->
             )
             .fillMaxWidth()
             .wrapContentHeight()
-            .absolutePadding(5.dp,5.dp,5.dp,0.dp),
+            .padding(vertical = Dimen.Padding.p1),
         backgroundColor = MaterialTheme.colors.onBackground,
-        shape = RoundedCornerShape(6.dp),
-        border = if (item.isSelected) BorderStroke(1.dp,MaterialTheme.colors.secondary) else null
+        shape = RoundedCornerShape(Dimen.Padding.p3),
+        border = if (item.isSelected) BorderStroke(1.dp,MaterialTheme.colors.secondary) else null,
+        elevation = Dimen.TopBar.elevation
     )
     {
         Column(
             modifier = Modifier
-                .padding(10.dp),
-            verticalArrangement = Arrangement.Center,
+                .padding(Dimen.Padding.p3),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.Start
 
         )
         {
             Text(
-                text = item.note.name,
-                color = MaterialTheme.colors.primary,
+                modifier = Modifier.padding(bottom = Dimen.Padding.p1),
+                text = item.note.nameWithoutExtension,
+                color = LocalCustomColorPalette.current.primary,
                 maxLines = 1,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.SemiBold
+                style = CustomTypography.textPrimary,
+                softWrap = true
 
             )
             Text(
+                modifier = Modifier.padding(bottom = Dimen.Padding.p1),
                 text = item.note.readText(),
-                color = MaterialTheme.colors.primaryVariant,
-                maxLines = 2,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Light,
-                textAlign = TextAlign.Justify
-
+                color = LocalCustomColorPalette.current.secondary,
+                maxLines = 1,
+                style = CustomTypography.textSecondary,
+                softWrap = true
+            )
+            Text(
+                modifier = Modifier.padding(bottom = Dimen.Padding.p1),
+                text = AppConverters.formattedDate(AppConverters.fromTimestamp(item.note.lastModified())),
+                color = LocalCustomColorPalette.current.secondary,
+                maxLines = 1,
+                style = CustomTypography.textTertiary,
+                softWrap = true
             )
         }
         

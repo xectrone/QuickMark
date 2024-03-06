@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.quickmark.ui.home_screen.HomeScreen
+import com.example.quickmark.ui.settings_screen.SettingsScreen
 
 @Composable
 fun HomeScreenNavGraph(navController: NavHostController)
@@ -13,6 +14,9 @@ fun HomeScreenNavGraph(navController: NavHostController)
     {
         composable(route = Screen.Home.route) {
             HomeScreen(navController = navController)
+        }
+        composable(route = Screen.Setting.route) {
+            SettingsScreen(navController = navController)
         }
     }
 }

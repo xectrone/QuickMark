@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.encrypsy.ui.theme.Dimen
+import com.example.quickmark.ui.theme.Dimen
 import com.example.quickmark.domain.file_handling.FileHelper
 import java.text.SimpleDateFormat
 import java.util.*

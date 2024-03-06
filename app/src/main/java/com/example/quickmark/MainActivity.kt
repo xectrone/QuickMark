@@ -17,7 +17,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.flashup.ui.theme.QuickMarkTheme
 import com.example.quickmark.data.datastore.DataStoreManager
 import com.example.quickmark.domain.navigation.HomeScreenNavGraph
-import com.example.quickmark.ui.settings_screen.SimpleScreen
 import com.example.quickmark.ui.add_note_dialog.AddNoteActivity
 import kotlinx.coroutines.launch
 
@@ -57,7 +56,7 @@ class MainActivity : ComponentActivity() {
         // Create a shortcut info
         val shortcutInfo = ShortcutInfo.Builder(this, "new_note_shortcut")
             .setShortLabel("New Note")
-            .setIcon(Icon.createWithResource(this, R.drawable.ic_launcher_foreground))
+            .setIcon(Icon.createWithResource(this, R.mipmap.ic_launcher))
             .setIntent(intent)
             .build()
 

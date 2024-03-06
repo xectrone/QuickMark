@@ -6,7 +6,7 @@
     >
     <item android:drawable="@color/black"></item>
     <item
-        android:drawable="@drawable/ic_launcher_foreground"
+        android:drawable="@drawable/ic_launcher_dark"
         android:gravity="center"
         android:height="200dp"
         android:width="200dp"

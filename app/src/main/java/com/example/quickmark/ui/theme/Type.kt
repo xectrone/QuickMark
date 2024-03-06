@@ -1,4 +1,4 @@
-package com.example.encrypsy.ui.theme
+package com.example.quickmark.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

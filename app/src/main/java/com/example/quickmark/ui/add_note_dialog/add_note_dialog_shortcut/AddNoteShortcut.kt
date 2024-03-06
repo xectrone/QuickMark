@@ -16,7 +16,7 @@ fun createAppShortcut(context: Context) {
         val shortcut = ShortcutInfo.Builder(context, "new_markdown_file")
             .setShortLabel("New Markdown File")
             .setLongLabel("Create a new Markdown file")
-            .setIcon(Icon.createWithResource(context, R.drawable.ic_launcher_foreground))
+            .setIcon(Icon.createWithResource(context, R.mipmap.ic_launcher))
             .setIntent(Intent(context, AddNoteActivity::class.java).apply {
                 action = Intent.ACTION_VIEW
             })
