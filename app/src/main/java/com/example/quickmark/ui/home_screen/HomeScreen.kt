@@ -20,20 +20,14 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.quickmark.ui.theme.Dimen
 import com.example.quickmark.R
-import com.example.quickmark.domain.file_handling.FileHelper
 import com.example.quickmark.domain.navigation.Screen
 import com.example.quickmark.ui.add_note_dialog.AddNoteActivity
 import com.example.quickmark.ui.theme.CustomTypography
@@ -46,9 +40,6 @@ fun HomeScreen(
     navController: NavHostController
 ) {
     val markdownFiles by viewModel.markdownFiles.collectAsStateWithLifecycle(emptyList())
-    Log.d("#TAG", "HomeScreen: $markdownFiles")
-    val context = LocalContext.current
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
 
     Scaffold(
         backgroundColor = LocalCustomColorPalette.current.background,
@@ -60,7 +51,7 @@ fun HomeScreen(
                 contentColor = LocalCustomColorPalette.current.primary,
                 title =
                 {
-                    Text(text = stringResource(id = R.string.app_name), style =  CustomTypography.heading)
+                    Text(text = stringResource(id = R.string.app_name), style =  CustomTypography.h2)
                 },
 
                 navigationIcon = {
@@ -90,8 +81,9 @@ fun HomeScreen(
             FloatingActionButton(
                 modifier = Modifier.padding(end = Dimen.Padding.p4, bottom = Dimen.Padding.p5),
                 onClick = {
-                    val intent = Intent(context, AddNoteActivity::class.java)
-                    launcher.launch(intent)
+                    navController.navigate(Screen.AddEditNote.route)
+//                    val intent = Intent(context, AddNoteActivity::class.java)
+//                    launcher.launch(intent)
                 },
                 backgroundColor = MaterialTheme.colors.secondary
             )

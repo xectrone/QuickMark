@@ -6,22 +6,32 @@ import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
+import android.widget.Toast
 import com.example.quickmark.R
 import com.example.quickmark.ui.add_note_dialog.AddNoteActivity
 
-fun createAppShortcut(context: Context) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-        val shortcutManager = context.getSystemService(ShortcutManager::class.java)
+fun addHomeScreenShortcut(context: Context) {
+    val shortcutManager = context.getSystemService(Context.SHORTCUT_SERVICE) as ShortcutManager
 
-        val shortcut = ShortcutInfo.Builder(context, "new_markdown_file")
-            .setShortLabel("New Markdown File")
-            .setLongLabel("Create a new Markdown file")
-            .setIcon(Icon.createWithResource(context, R.mipmap.ic_launcher))
-            .setIntent(Intent(context, AddNoteActivity::class.java).apply {
-                action = Intent.ACTION_VIEW
-            })
-            .build()
+    // Create an intent to launch the dialog activity
+    val intent = Intent(context, AddNoteActivity::class.java)
+    intent.action = Intent.ACTION_CREATE_SHORTCUT
 
-        shortcutManager!!.dynamicShortcuts = listOf(shortcut)
+    // Create a shortcut info
+    val shortcutInfo = ShortcutInfo.Builder(context, "new_note_shortcut")
+        .setShortLabel("Add Note")
+        .setIcon(Icon.createWithResource(context, R.mipmap.ic_launcher))
+        .setIntent(intent)
+        .build()
+
+    // Check if shortcut already exists
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (!shortcutManager.isRequestPinShortcutSupported) {
+            Toast.makeText(context, "Pin shortcut is not supported", Toast.LENGTH_SHORT).show()
+            return
+        }
+        else
+            Toast.makeText(context, "Shortcut is Created !", Toast.LENGTH_SHORT).show()
     }
+    shortcutManager.requestPinShortcut(shortcutInfo, null)
 }

@@ -39,11 +39,12 @@ class FileHelper(private val directoryPath: String) {
 
     fun saveMarkdownFile(fileName: String, content: String) {
         val file = File(directoryPath, fileName)
-
         try {
             file.writeText(content)
+            Log.d("#TAG", "saveMarkdownFile: Saved !")
         } catch (e: IOException) {
-            // Handle IOException
+            Log.d("#TAG", "saveMarkdownFile: $e")
+
         }
     }
 

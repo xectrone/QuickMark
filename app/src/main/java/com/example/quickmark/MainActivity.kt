@@ -22,21 +22,8 @@ import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
-    private val directoryPathManager by lazy { DataStoreManager(applicationContext) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val chooseDirectoryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val directoryPath = result.data?.getStringExtra("directory_path")
-                if (!directoryPath.isNullOrEmpty()) {
-                    lifecycleScope.launch {
-                        directoryPathManager.saveDirectoryPath(directoryPath)
-                    }
-                }
-            }
-        }
-
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
@@ -44,31 +31,8 @@ class MainActivity : ComponentActivity() {
                 HomeScreenNavGraph(navController = rememberNavController())
             }
         }
-        addHomeScreenShortcut()
     }
-    private fun addHomeScreenShortcut() {
-        val shortcutManager = getSystemService(Context.SHORTCUT_SERVICE) as ShortcutManager
 
-        // Create an intent to launch the dialog activity
-        val intent = Intent(this, AddNoteActivity::class.java)
-        intent.action = Intent.ACTION_CREATE_SHORTCUT
-
-        // Create a shortcut info
-        val shortcutInfo = ShortcutInfo.Builder(this, "new_note_shortcut")
-            .setShortLabel("New Note")
-            .setIcon(Icon.createWithResource(this, R.mipmap.ic_launcher))
-            .setIntent(intent)
-            .build()
-
-        // Check if shortcut already exists
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (!shortcutManager.isRequestPinShortcutSupported) {
-                Toast.makeText(this, "Pin shortcut is not supported", Toast.LENGTH_SHORT).show()
-                return
-            }
-        }
-        shortcutManager.requestPinShortcut(shortcutInfo, null)
-    }
 }
 
 

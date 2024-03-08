@@ -54,7 +54,7 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
         fileObserver.stopWatching()
     }
 
-    private fun getDirectoryPath() {
+    fun getDirectoryPath() {
         viewModelScope.launch {
             dataStoreManager.directoryPathFlow.collect { path ->
                 if (!path.isNullOrEmpty()) {

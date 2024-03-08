@@ -24,9 +24,29 @@ object CustomTypography {
 //        letterSpacing = 1.5.sp
     )
 
-    val heading = TextStyle(
+    val h2 = TextStyle(
     fontWeight = FontWeight.Bold,
     fontSize = 20.sp,
     letterSpacing = 0.15.sp
     )
+
+    val title = TextStyle(
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp,
+        letterSpacing = 0.15.sp
+    )
+
+    val titleSecondary = TextStyle(
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        letterSpacing = 0.15.sp
+    )
+
+
+    val body = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        letterSpacing = 0.5.sp
+    )
+
 }
