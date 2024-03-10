@@ -4,5 +4,5 @@ import java.io.File
 
 data class NoteSelectionListItem(
     val note: File,
-    val isSelected: Boolean
+    val isSelected: Boolean = false
 )

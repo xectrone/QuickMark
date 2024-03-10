@@ -1,10 +1,6 @@
 package com.example.quickmark.ui.home_screen
 
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,19 +13,19 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.quickmark.ui.theme.Dimen
 import com.example.quickmark.R
 import com.example.quickmark.domain.navigation.Screen
-import com.example.quickmark.ui.add_note_dialog.AddNoteActivity
 import com.example.quickmark.ui.theme.CustomTypography
 import com.example.quickmark.ui.theme.LocalCustomColorPalette
 
@@ -39,7 +35,8 @@ fun HomeScreen(
     viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     navController: NavHostController
 ) {
-    val markdownFiles by viewModel.markdownFiles.collectAsStateWithLifecycle(emptyList())
+    val markdownFilesList by viewModel.markdownFilesList.collectAsStateWithLifecycle(emptyList())
+    val selectionMode by viewModel.selectionMode
 
     Scaffold(
         backgroundColor = LocalCustomColorPalette.current.background,
@@ -64,6 +61,18 @@ fun HomeScreen(
                     { Icon(imageVector = Icons.Rounded.Menu, contentDescription = null) }
                 },
                 actions = {
+                    if(selectionMode) {
+                        IconButton(
+                            onClick = { viewModel.onDelete() }
+                        )
+                        { Icon(imageVector = Icons.Rounded.Delete, contentDescription = null) }
+
+                        IconButton(
+                            onClick = { viewModel.onClear() }
+                        )
+                        { Icon(imageVector = Icons.Rounded.Clear, contentDescription = null) }
+                    }
+
                     IconButton(
                         onClick =
                         {
@@ -102,22 +111,18 @@ fun HomeScreen(
                 .padding(horizontal = Dimen.Padding.p4)
         ){
             //region - Flashcard List View -
-            items(markdownFiles.sortedByDescending { it.lastModified() })
+            items(markdownFilesList.sortedByDescending { it.note.lastModified() })
             {
                 NoteListItem(
-                    item = NoteSelectionListItem(it,false),
+                    item = NoteSelectionListItem(it.note,it.isSelected),
                     onClick =
                     {
-                        if (false)
-//                            viewModel.onItemClick(it)
-                        else {
-//                            searchAppBarViewModel.updateSearchAppBarState(SearchAppBarState.CLOSED)
-//                            navController.navigate(route = Screen.AddEditFlashcard.navArg(parentId, it.flashcard.id))
-                        }
+                        if (selectionMode)
+                            viewModel.onItemClick(it)
+                        else
+                            navController.navigate(route = Screen.AddEditNote.navArg(it.note.nameWithoutExtension))
                     },
-                    onLongClick = {
-//                        viewModel.onItemLongClick(it)
-                    }
+                    onLongClick = { viewModel.onItemLongClick(it) }
                 )
             }
         }

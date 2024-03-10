@@ -7,33 +7,54 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickmark.data.datastore.DataStoreManager
-import kotlinx.coroutines.flow.Flow
+import com.example.quickmark.domain.file_handling.FileHelper
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.File
 
-class HomeViewModel(application: Application): AndroidViewModel(application) {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val dataStoreManager: DataStoreManager = DataStoreManager.getInstance(application)
 
-    private val _directoryPath = mutableStateOf<String>("")
-    val directoryPath: State<String> = _directoryPath
+    private val directoryPath = MutableStateFlow<String>("")
 
-    private val _markdownFiles = MutableStateFlow<List<File>>(emptyList())
-    val markdownFiles: Flow<List<File>> = _markdownFiles.asStateFlow()
+    private val _markdownFilesList = MutableStateFlow<List<NoteSelectionListItem>>(emptyList())
+    val markdownFilesList: StateFlow<List<NoteSelectionListItem>> = _markdownFilesList
+
+    private val _selectionMode = mutableStateOf(false)
+    val selectionMode: State<Boolean> = _selectionMode
+
+    private var fileObserver: FileObserver? = null
+    private lateinit var fileHelper: FileHelper
 
 
-    private val fileObserver = object : FileObserver(File(directoryPath.value), CREATE or DELETE or MODIFY) {
-        override fun onEvent(event: Int, path: String?) {
-            viewModelScope.launch {
-                refreshMarkdownFiles()
+    init {
+        observeDirectoryPath()
+    }
+
+    private fun observeDirectoryPath() {
+        viewModelScope.launch {
+            dataStoreManager.directoryPathFlow.collect { path ->
+                if (!path.isNullOrEmpty()) {
+                    directoryPath.value = path
+                    fileHelper = FileHelper(directoryPath = directoryPath.value)
+                    startFileObserver()
+                    refreshMarkdownFiles()
+                }
             }
         }
     }
 
-    init {
-        getDirectoryPath()
-        fileObserver.startWatching()
+    private fun startFileObserver() {
+        fileObserver?.stopWatching()
+        fileObserver = object : FileObserver(File(directoryPath.value), CREATE or DELETE or MODIFY) {
+            override fun onEvent(event: Int, path: String?) {
+                viewModelScope.launch {
+                    refreshMarkdownFiles()
+                }
+            }
+        }
+        fileObserver?.startWatching()
     }
 
     private suspend fun refreshMarkdownFiles() {
@@ -46,22 +67,39 @@ class HomeViewModel(application: Application): AndroidViewModel(application) {
                 }
             }
         }
-        _markdownFiles.emit(markdownFilesList)
+        _markdownFilesList.value = markdownFilesList.map { NoteSelectionListItem(it) }
     }
 
     override fun onCleared() {
         super.onCleared()
-        fileObserver.stopWatching()
+        fileObserver?.stopWatching()
     }
 
-    fun getDirectoryPath() {
+    fun onDelete() {
         viewModelScope.launch {
-            dataStoreManager.directoryPathFlow.collect { path ->
-                if (!path.isNullOrEmpty()) {
-                    _directoryPath.value = path
-                    refreshMarkdownFiles() // Refresh markdown files when directory path changes
-                }
-            }
+            markdownFilesList.value.filter { it.isSelected }
+                .forEach { item -> fileHelper.deleteMarkdownFile(item.note.name, getApplication()) }
+            _selectionMode.value = false
+        }
+    }
+
+    fun onItemClick(item: NoteSelectionListItem) {
+        _markdownFilesList.value = markdownFilesList.value.map { if (it == item) it.copy(isSelected = !it.isSelected) else it }
+        if (_markdownFilesList.value.none { it.isSelected })
+            _selectionMode.value = false
+    }
+
+    fun onItemLongClick(item: NoteSelectionListItem) {
+        if (!selectionMode.value) {
+            _selectionMode.value = true
+            _markdownFilesList.value = markdownFilesList.value.map { if (it == item) it.copy(isSelected = !it.isSelected) else it }
+        }
+    }
+
+    fun onClear(){
+        if(selectionMode.value){
+            _markdownFilesList.value = _markdownFilesList.value.map { NoteSelectionListItem(it.note) }
+            _selectionMode.value = false
         }
     }
 }

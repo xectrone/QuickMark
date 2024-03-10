@@ -1,4 +1,4 @@
-package com.example.quickmark.ui.add_edit_note_screen
+package com.example.quickmark.ui.add_note_dialog.add_note_dialog
 
 import android.app.Application
 import androidx.compose.runtime.State
@@ -9,8 +9,11 @@ import com.example.quickmark.data.Util
 import com.example.quickmark.data.datastore.DataStoreManager
 import com.example.quickmark.domain.file_handling.FileHelper
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-class AddEditNoteViewModel(application: Application): AndroidViewModel(application) {
+class AddNoteViewModel(application: Application): AndroidViewModel(application) {
     private val dataStoreManager: DataStoreManager = DataStoreManager.getInstance(application)
 
     private val directoryPath = mutableStateOf<String>("")
@@ -20,9 +23,6 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
 
     private val _noteTitle = mutableStateOf<String>(Util.defaultFileName())
     val noteTitle: State<String> = _noteTitle
-
-    private val _edit = mutableStateOf<Boolean>(true)
-    val edit: State<Boolean> = _edit
 
     private lateinit var fileHelper: FileHelper
 
@@ -49,24 +49,7 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
         _noteTitle.value = value
     }
 
-    fun onEditClick(){
-        _edit.value = true
-    }
-
-
-    fun onCreateNote(){
+    fun onSaveClick(){
         fileHelper.createMarkdownFile(noteTitle.value, noteContent.value, getApplication())
-        _edit.value = false
-
-    }
-
-    fun onEditNote(oldFileName:String){
-        fileHelper.editMarkdownFile(oldFileName,noteTitle.value, noteContent.value, getApplication())
-        _edit.value = false
-    }
-
-    fun setContent(fileName:String) {
-        _noteContent.value =  fileHelper.readMarkdownFile(fileName, getApplication())
-        _noteTitle.value = fileName
     }
 }

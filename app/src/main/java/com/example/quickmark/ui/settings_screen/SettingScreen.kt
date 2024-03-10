@@ -40,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.example.quickmark.R
 import com.example.quickmark.ui.add_note_dialog.add_note_dialog_shortcut.addHomeScreenShortcut
+import com.example.quickmark.ui.theme.CustomShape
 import com.example.quickmark.ui.theme.CustomTypography
 import com.example.quickmark.ui.theme.Dimen
 import com.example.quickmark.ui.theme.LocalCustomColorPalette
@@ -154,7 +155,7 @@ fun SettingsScreen(
                     focusedBorderColor = LocalCustomColorPalette.current.secondary
                 ),
                 enabled = editDirectoryPath,
-                shape = RoundedCornerShape(Dimen.Padding.p4),
+                shape = CustomShape.textField,
 
             )
 
@@ -162,7 +163,7 @@ fun SettingsScreen(
                 modifier = Modifier
                     .padding(bottom = Dimen.Padding.p2)
                     .align(Alignment.End),
-                shape = RoundedCornerShape(Dimen.Padding.p3),
+                shape = CustomShape.button,
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = LocalCustomColorPalette.current.accentSecondary,
                     contentColor = LocalCustomColorPalette.current.background
@@ -205,7 +206,7 @@ fun SettingsScreen(
                 Button(
                     modifier = Modifier
                         .padding(bottom = Dimen.Padding.p2),
-                    shape = RoundedCornerShape(Dimen.Padding.p3),
+                    shape = CustomShape.button,
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = LocalCustomColorPalette.current.accentSecondary,
                         contentColor = LocalCustomColorPalette.current.background

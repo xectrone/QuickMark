@@ -12,11 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.ui.Alignment
 import com.example.quickmark.ui.theme.Dimen
-import com.example.quickmark.data.AppConverters
+import com.example.quickmark.data.Util
 import com.example.quickmark.ui.theme.CustomTypography
 import com.example.quickmark.ui.theme.LocalCustomColorPalette
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -33,7 +31,7 @@ fun NoteListItem(item: NoteSelectionListItem, onClick:()->Unit, onLongClick:()->
             .padding(vertical = Dimen.Padding.p1),
         backgroundColor = MaterialTheme.colors.onBackground,
         shape = RoundedCornerShape(Dimen.Padding.p3),
-        border = if (item.isSelected) BorderStroke(1.dp,MaterialTheme.colors.secondary) else null,
+        border = if (item.isSelected) BorderStroke(1.dp, LocalCustomColorPalette.current.accent) else null,
         elevation = Dimen.TopBar.elevation
     )
     {
@@ -64,7 +62,7 @@ fun NoteListItem(item: NoteSelectionListItem, onClick:()->Unit, onLongClick:()->
             )
             Text(
                 modifier = Modifier.padding(bottom = Dimen.Padding.p1),
-                text = AppConverters.formattedDate(AppConverters.fromTimestamp(item.note.lastModified())),
+                text = Util.formattedDate(Util.fromTimestamp(item.note.lastModified())),
                 color = LocalCustomColorPalette.current.secondary,
                 maxLines = 1,
                 style = CustomTypography.textTertiary,

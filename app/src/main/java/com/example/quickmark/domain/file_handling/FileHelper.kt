@@ -1,8 +1,10 @@
 package com.example.quickmark.domain.file_handling
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import com.example.quickmark.ui.theme.Constants
 import java.io.File
-import java.io.FileFilter
 import java.io.IOException
 
 class FileHelper(private val directoryPath: String) {
@@ -22,40 +24,65 @@ class FileHelper(private val directoryPath: String) {
         return markdownFiles
     }
 
-    fun readMarkdownFile(fileName: String): String {
-        val file = File(directoryPath, fileName)
-        val stringBuilder = StringBuilder()
+    fun readMarkdownFile(fileName: String, context: Context): String {
+        val adjustedFileName = adjustFileName(fileName)
+        val file = File(directoryPath, adjustedFileName)
+        var content = ""
 
         try {
-            file.forEachLine {
-                stringBuilder.appendLine(it)
-            }
+            content = file.readText()
         } catch (e: IOException) {
-            // Handle IOException
+            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
         }
-
-        return stringBuilder.toString()
+        return content
     }
 
-    fun saveMarkdownFile(fileName: String, content: String) {
-        val file = File(directoryPath, fileName)
+    fun editMarkdownFile(oldFileName: String,fileName: String, content: String, context: Context) {
+        Log.d("#TAG", "editMarkdownFile: ")
+        val adjustedFileName = adjustFileName(fileName)
+        val adjustedOldFileName = adjustFileName(oldFileName)
+
+        val file = File(directoryPath, adjustedOldFileName)
         try {
             file.writeText(content)
-            Log.d("#TAG", "saveMarkdownFile: Saved !")
+            file.renameTo(File(directoryPath, adjustedFileName))
         } catch (e: IOException) {
-            Log.d("#TAG", "saveMarkdownFile: $e")
+            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+        }
+    }
 
+    fun createMarkdownFile(fileName: String, content: String,context: Context) {
+        // Check if the file name contains the .md extension
+        Log.d("#TAG", "createMarkdownFile: ")
+        val adjustedFileName = adjustFileName(fileName)
+        val file = File(directoryPath, adjustedFileName)
+        if (file.exists()) {
+            Toast.makeText(context, Constants.ExceptionToast.FILE_ALREADY_EXIST, Toast.LENGTH_LONG).show()
+            return
+        }
+        try {
+            file.writeText(content)
+        } catch (e: IOException) {
+            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
         }
     }
 
 
-    fun deleteMarkdownFile(fileName: String): Boolean {
+
+    fun deleteMarkdownFile(fileName: String, context: Context){
         val file = File(directoryPath, fileName)
 
-        return if (file.exists() && file.isFile) {
+        if (file.exists() && file.isFile)
             file.delete()
+        else
+            Toast.makeText(context, Constants.ExceptionToast.GENERAL, Toast.LENGTH_LONG).show()
+    }
+
+    private fun adjustFileName(fileName:String):String{
+        return if (!fileName.endsWith(".md", ignoreCase = true)) {
+            "$fileName.md"
         } else {
-            false
+            fileName
         }
     }
 }

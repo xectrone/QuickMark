@@ -13,20 +13,24 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.quickmark.ui.theme.Dimen
 import com.example.quickmark.domain.file_handling.FileHelper
+import com.example.quickmark.ui.theme.CustomShape
+import com.example.quickmark.ui.theme.LocalCustomColorPalette
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 @Composable
 fun AddNoteDialog(
+    viewModel: AddNoteViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     finish: () -> Unit
 ) {
-    val fileHelper = FileHelper("/storage/emulated/0/0.MEDIA/qn")
+    val noteContent by viewModel.noteContent
+    val noteTitle by viewModel.noteTitle
 
     val textFieldColor = TextFieldDefaults.textFieldColors(
-        textColor = MaterialTheme.colors.primary,
-        cursorColor = MaterialTheme.colors.primary,
-        placeholderColor = MaterialTheme.colors.primary.copy(0.4f),
+        textColor = LocalCustomColorPalette.current.primary,
+        cursorColor = LocalCustomColorPalette.current.primary,
+        placeholderColor = LocalCustomColorPalette.current.primary.copy(0.4f),
         backgroundColor = Color.Transparent,
         focusedIndicatorColor = Color.Transparent,
         unfocusedIndicatorColor = Color.Transparent,
@@ -47,11 +51,9 @@ fun AddNoteDialog(
                 .padding(Dimen.Padding.p5),
             shape = RoundedCornerShape(Dimen.Padding.p3),
             elevation = Dimen.Padding.p2,
-            color = MaterialTheme.colors.surface
+            color = LocalCustomColorPalette.current.surface
 
         ) {
-            var title by remember { mutableStateOf(SimpleDateFormat("yyyy-MM-dd HH-mm-ss", Locale.getDefault()).format(Date())) }
-            var content by remember { mutableStateOf("")}
 
             Column(
                 modifier = Modifier.padding(Dimen.Padding.p3),
@@ -60,8 +62,8 @@ fun AddNoteDialog(
             ) {
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = title,
-                    onValueChange = { title = it },
+                    value = noteTitle,
+                    onValueChange = { viewModel.onNoteTitleChange(it) },
                     placeholder = {
                         Text(
                             text = "Title",
@@ -74,8 +76,8 @@ fun AddNoteDialog(
 
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = content,
-                    onValueChange = { content = it },
+                    value = noteContent,
+                    onValueChange = { viewModel.onNoteContentChange(it) },
                     placeholder = { Text("Write here...") },
                     colors = textFieldColor,
                     textStyle = MaterialTheme.typography.subtitle1.copy(fontSize = 16.sp)
@@ -84,18 +86,20 @@ fun AddNoteDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
+                    shape = RoundedCornerShape(Dimen.Padding.p2),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = LocalCustomColorPalette.current.primary,
+                        contentColor = LocalCustomColorPalette.current.backgroundSecondary
+                    ),
                     onClick = {
-                        if (title.isNotEmpty()) {
-                            fileHelper.saveMarkdownFile(
-                                fileName = "$title.md",
-                                content = content
-                            )
+                        if (noteTitle.isNotEmpty()) {
+                                viewModel.onSaveClick()
                             finish()
                         }
 
                     }
                 ) {
-                    Text(text = "Done")
+                    Text(text = "Add")
                 }
             }
         }
