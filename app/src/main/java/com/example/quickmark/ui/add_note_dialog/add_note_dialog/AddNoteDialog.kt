@@ -1,18 +1,23 @@
 package com.example.quickmark.ui.add_note_dialog.add_note_dialog
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.quickmark.ui.theme.Dimen
 import com.example.quickmark.domain.file_handling.FileHelper
+import com.example.quickmark.ui.theme.Constants
 import com.example.quickmark.ui.theme.CustomShape
 import com.example.quickmark.ui.theme.LocalCustomColorPalette
 import java.text.SimpleDateFormat
@@ -26,6 +31,7 @@ fun AddNoteDialog(
 ) {
     val noteContent by viewModel.noteContent
     val noteTitle by viewModel.noteTitle
+    val context = LocalContext.current
 
     val textFieldColor = TextFieldDefaults.textFieldColors(
         textColor = LocalCustomColorPalette.current.primary,
@@ -71,7 +77,12 @@ fun AddNoteDialog(
                         )
                                   },
                     colors = textFieldColor,
-                    textStyle = MaterialTheme.typography.subtitle2
+                    textStyle = MaterialTheme.typography.subtitle2,
+                    trailingIcon = {
+                        IconButton(onClick = { viewModel.onNoteTitleChange("") }) {
+                            Icon(modifier= Modifier.size(18.dp) ,imageVector = Icons.Rounded.Clear, contentDescription ="Clear Note Title", tint = LocalCustomColorPalette.current.primary.copy(0.4f))
+                        }
+                    }
                 )
 
                 TextField(
@@ -92,9 +103,12 @@ fun AddNoteDialog(
                         contentColor = LocalCustomColorPalette.current.backgroundSecondary
                     ),
                     onClick = {
-                        if (noteTitle.isNotEmpty()) {
+                        if (noteTitle.isNotBlank()) {
                                 viewModel.onSaveClick()
                             finish()
+                        }
+                        else{
+                            Toast.makeText(context, Constants.ExceptionToast.NO_NOTE_TITLE, Toast.LENGTH_LONG).show()
                         }
 
                     }

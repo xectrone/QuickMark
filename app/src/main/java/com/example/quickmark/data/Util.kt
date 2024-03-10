@@ -20,11 +20,11 @@ object Util
 
     fun fromTimestamp(value: Long): LocalDateTime
     {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(value), ZoneOffset.UTC)
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(value), ZoneOffset.systemDefault())
     }
     fun dateToTimestamp(date: LocalDateTime): Long
     {
-        return date.atZone(ZoneOffset.UTC).toInstant().toEpochMilli()
+        return date.atZone(ZoneOffset.systemDefault()).toInstant().toEpochMilli()
     }
 
     fun formattedDate(date: LocalDateTime): String
