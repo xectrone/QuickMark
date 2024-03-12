@@ -75,9 +75,6 @@ dependencies {
     // Preferences Data Store
     implementation "androidx.datastore:datastore-preferences:1.0.0"
 
-    // Navigation Animation
-    implementation "com.google.accompanist:accompanist-navigation-animation:0.30.0"
-
     // Permissions
     implementation "com.google.accompanist:accompanist-permissions:0.30.0"
 

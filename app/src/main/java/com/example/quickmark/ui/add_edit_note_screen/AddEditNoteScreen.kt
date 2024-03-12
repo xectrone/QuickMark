@@ -17,7 +17,6 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Edit
@@ -28,6 +27,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -54,6 +55,11 @@ fun AddEditNoteScreen(
     var isNewNote by remember { mutableStateOf(true) }
 
     val context = LocalContext.current
+
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     LaunchedEffect(fileName){
         if (fileName.isNotBlank()) {
@@ -123,7 +129,7 @@ fun AddEditNoteScreen(
                                     viewModel.onEditNote(fileName)
                             }
                             else{
-                                Toast.makeText(context,Constants.ExceptionToast.NO_NOTE_TITLE, Toast.LENGTH_LONG).show()
+                                Toast.makeText(context,Constants.ExceptionToast.VALID_TITLE, Toast.LENGTH_LONG).show()
                             }
 
                         }
@@ -177,7 +183,10 @@ fun AddEditNoteScreen(
                 value = noteTitle,
                 onValueChange = {
                     viewModel.onNoteTitleChange(it)
-                    isValidFileName = Util.isValidFileName(it)
+                    isValidFileName = if(isNewNote)
+                        (Util.isValidFileName(it) && !viewModel.isNoteExists(it))
+                    else
+                        Util.isValidFileName(it)
                                 },
                 textStyle = CustomTypography.title,
                 readOnly = !edit,
@@ -206,7 +215,8 @@ fun AddEditNoteScreen(
 
             TextField(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .focusRequester(focusRequester),
                 value = noteContent,
                 onValueChange = { viewModel.onNoteContentChange(it)},
                 textStyle = CustomTypography.body,
@@ -225,7 +235,7 @@ fun AddEditNoteScreen(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     errorIndicatorColor = Color.Red
-                ),
+                )
             )
         }
     }

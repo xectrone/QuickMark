@@ -52,4 +52,8 @@ class AddNoteViewModel(application: Application): AndroidViewModel(application) 
     fun onSaveClick(){
         fileHelper.createMarkdownFile(noteTitle.value, noteContent.value, getApplication())
     }
+
+    fun isNoteExists(fileName: String): Boolean{
+        return fileHelper.isFileExists(fileName)
+    }
 }

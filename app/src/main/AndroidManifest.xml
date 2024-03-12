@@ -11,7 +11,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/SplashScreen"
+        android:theme="@style/Theme.QuickMark"
         tools:targetApi="31"
         >
         <activity
@@ -28,14 +28,9 @@
             android:name=".ui.add_note_dialog.AddNoteActivity"
             android:exported="true"
             android:label="Add Note Activity"
+            android:launchMode="singleTask"
             android:theme="@style/Theme.TransparentActivity">
-            <intent-filter>
-                <action android:name="@string/add_note_intent"/>
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
-
-
 
 
         <receiver android:name=".ui.add_note_dialog.add_note_dialog_widget.AddNoteWidgetClickListener"

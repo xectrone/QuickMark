@@ -69,4 +69,8 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
         _noteContent.value =  fileHelper.readMarkdownFile(fileName, getApplication())
         _noteTitle.value = fileName
     }
+
+    fun isNoteExists(fileName: String): Boolean{
+        return fileHelper.isFileExists(fileName)
+    }
 }

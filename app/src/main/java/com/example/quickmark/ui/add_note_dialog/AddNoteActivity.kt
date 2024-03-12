@@ -11,7 +11,7 @@ class AddNoteActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             QuickMarkTheme {
-                AddNoteDialog { finish() }
+                AddNoteDialog() { finish() }
 //                finish()
             }
         }

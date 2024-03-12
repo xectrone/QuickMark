@@ -22,8 +22,10 @@ import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(R.style.Theme_QuickMark)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
@@ -32,6 +34,8 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+
 
 }
 

@@ -67,6 +67,12 @@ class FileHelper(private val directoryPath: String) {
         }
     }
 
+    fun isFileExists(fileName: String):Boolean{
+        val adjustedFileName = adjustFileName(fileName)
+        val file = File(directoryPath, adjustedFileName)
+        return file.exists()
+    }
+
 
 
     fun deleteMarkdownFile(fileName: String, context: Context){
