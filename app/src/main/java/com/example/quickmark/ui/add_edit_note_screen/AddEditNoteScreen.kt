@@ -109,6 +109,7 @@ fun AddEditNoteScreen(
         },
         //endregion
 
+        //region - Floating Action Button -
         floatingActionButton =
         {
             if (isValidFileName)
@@ -123,8 +124,10 @@ fun AddEditNoteScreen(
                         onClick =
                         {
                             if(noteTitle.isNotBlank()){
-                                if (isNewNote)
+                                if (isNewNote) {
                                     viewModel.onCreateNote()
+                                    navController.navigateUp()
+                                }
                                 else
                                     viewModel.onEditNote(fileName)
                             }
@@ -152,7 +155,6 @@ fun AddEditNoteScreen(
                         onClick =
                         {
                             viewModel.onEditClick()
-
                         }
                     )
                     {
@@ -166,12 +168,9 @@ fun AddEditNoteScreen(
                 }
 
             }
-            else
-            { }
 
         }
-
-
+        //endregion
 
     ) {
         Column(

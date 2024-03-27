@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.quickmark"
-        minSdk 30
+        minSdk 28
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -74,8 +74,5 @@ dependencies {
 
     // Preferences Data Store
     implementation "androidx.datastore:datastore-preferences:1.0.0"
-
-    // Permissions
-    implementation "com.google.accompanist:accompanist-permissions:0.30.0"
 
 }
