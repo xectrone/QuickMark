@@ -35,11 +35,14 @@ val OnLightCustomColorPalette = CustomColorPalette(
 )
 
 val OnDarkCustomColorPalette = CustomColorPalette(
-    primary = Color(0xFF000000),
-    secondary = Color(0xFF5D5E5E),
+    primary = Color(0xFFFFFFFF ),
+    secondary = Color(0xFFBFBFBF),
     tertiary = Color(0xFF828484),
-    background = Color(color = 0xFFF6F8F8),
-    backgroundSecondary = Color(0xFFFFFFFF),
-    surface = Color(0xFFFFFFFF),
-    accent = Color(0xFF03A9F4)
+    quaternary = Color(0xFF4F5151),
+    background = Color(color = 0xFF000000),
+    backgroundSecondary = Color(0xFF000000),
+    surface = Color(0xFF242424),
+    accent = Color(0xFF03A9F4),
+    accentSecondary = Color(0xFF6E8CA0)
+
 )

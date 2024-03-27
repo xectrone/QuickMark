@@ -48,8 +48,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    //region - Permission -
     private fun checkPermission(context: Context):Boolean {
-
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Environment.isExternalStorageManager()
         } else {
@@ -85,6 +85,7 @@ class MainActivity : ComponentActivity() {
                 WRITE_EXTERNAL_STORAGE))
         }
     }
+    //endregion
 
 
 

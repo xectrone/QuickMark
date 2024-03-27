@@ -90,6 +90,7 @@ fun SettingsScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         backgroundColor = LocalCustomColorPalette.current.background,
+        //region - Top Bar -
         topBar = {
             TopAppBar(
                 modifier = Modifier.padding(top = Dimen.Padding.statusBar),
@@ -113,13 +114,14 @@ fun SettingsScreen(
             )
 
         }
-
+        //endregion
 
     ) {
         Column(
             modifier = Modifier
                 .padding(Dimen.Padding.p4)
         ) {
+            //region - Directory Path -
             Text(
                 modifier = Modifier.padding(bottom = Dimen.Padding.p2),
                 text = "Directory Path",
@@ -177,6 +179,7 @@ fun SettingsScreen(
                     text = "Choose Directory"
                 )
             }
+            //endregion
 
 
             Divider(

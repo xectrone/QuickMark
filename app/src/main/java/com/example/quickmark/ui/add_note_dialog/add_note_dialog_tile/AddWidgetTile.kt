@@ -2,9 +2,11 @@ package com.example.quickmark.ui.add_note_dialog.add_note_dialog_tile
 
 import android.content.Intent
 import android.graphics.drawable.Icon
+import android.os.Build
 
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.ui.res.painterResource
@@ -20,6 +22,7 @@ class AddNoteDialogService : TileService() {
         startActivityAndCollapse(intent)
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onStartListening() {
         super.onStartListening()
         // Set up tile appearance
