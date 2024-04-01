@@ -33,6 +33,7 @@
                 android:name="android.app.shortcuts"/>
         </activity>
         <activity
+            android:taskAffinity=".ui.add_note_dialog.AddNoteActivity"
             android:name=".ui.add_note_dialog.AddNoteActivity"
             android:exported="true"
             android:label="Add Note Activity"
