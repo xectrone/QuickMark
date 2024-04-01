@@ -191,10 +191,10 @@ fun AddEditNoteScreen(
                 readOnly = !edit,
                 isError = !isValidFileName,
                 placeholder ={
-                             Text(
-                                 text = "Title",
-                                 style = CustomTypography.title
-                             )
+                     Text(
+                         text = "Title",
+                         style = CustomTypography.title
+                     )
                 },
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = MaterialTheme.colors.primary,
@@ -206,7 +206,10 @@ fun AddEditNoteScreen(
                     errorIndicatorColor = Color.Red
                 ),
                 trailingIcon = {
-                    IconButton(onClick = { viewModel.onNoteTitleChange("") }) {
+                    IconButton(
+                        enabled = edit,
+                        onClick = { viewModel.onNoteTitleChange("") }
+                    ) {
                         Icon(imageVector = Icons.Rounded.Clear, contentDescription ="Clear Note Title", tint = LocalCustomColorPalette.current.primary.copy(0.4f))
                     }
                 }
