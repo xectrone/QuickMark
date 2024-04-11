@@ -69,10 +69,7 @@ fun NoteListItem(item: NoteSelectionListItem, onClick:()->Unit, onLongClick:()->
                 softWrap = true
             )
         }
-        
     }
-
-
 }
 
 

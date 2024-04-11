@@ -26,8 +26,10 @@ import androidx.navigation.NavHostController
 import com.example.quickmark.ui.theme.Dimen
 import com.example.quickmark.R
 import com.example.quickmark.domain.navigation.Screen
+import com.example.quickmark.ui.theme.Constants
 import com.example.quickmark.ui.theme.CustomTypography
 import com.example.quickmark.ui.theme.LocalCustomColorPalette
+import com.example.quickmark.ui.utility.MessageScreen
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -37,6 +39,7 @@ fun HomeScreen(
 ) {
     val markdownFilesList by viewModel.markdownFilesList.collectAsStateWithLifecycle(emptyList())
     val selectionMode by viewModel.selectionMode
+    val directoryPath by viewModel.directoryPath.collectAsStateWithLifecycle("NONE")
 
     Scaffold(
         backgroundColor = LocalCustomColorPalette.current.background,
@@ -87,89 +90,51 @@ fun HomeScreen(
 
         },
         floatingActionButton = {
-            FloatingActionButton(
-                modifier = Modifier.padding(end = Dimen.Padding.p4, bottom = Dimen.Padding.p5),
-                onClick = {
-                    navController.navigate(Screen.AddEditNote.route)
-//                    val intent = Intent(context, AddNoteActivity::class.java)
-//                    launcher.launch(intent)
-                },
-                backgroundColor = MaterialTheme.colors.secondary
-            )
+            if (directoryPath.isNotBlank())
             {
-                Icon(
-                    imageVector = Icons.Rounded.Add,
-                    contentDescription = "Add",
-                    tint = MaterialTheme.colors.background
-                )
-            }
-        },
-    )
-    {
-        LazyColumn(
-            modifier = Modifier
-                .padding(horizontal = Dimen.Padding.p4)
-        ){
-            //region - Flashcard List View -
-            items(markdownFilesList.sortedByDescending { it.note.lastModified() })
-            {
-                NoteListItem(
-                    item = NoteSelectionListItem(it.note,it.isSelected),
-                    onClick =
-                    {
-                        if (selectionMode)
-                            viewModel.onItemClick(it)
-                        else
-                            navController.navigate(route = Screen.AddEditNote.navArg(it.note.nameWithoutExtension))
+                FloatingActionButton(
+                    modifier = Modifier.padding(end = Dimen.Padding.p4, bottom = Dimen.Padding.p5),
+                    onClick = {
+                        navController.navigate(Screen.AddEditNote.route)
                     },
-                    onLongClick = { viewModel.onItemLongClick(it) }
+                    backgroundColor = MaterialTheme.colors.secondary
                 )
+                {
+                    Icon(
+                        imageVector = Icons.Rounded.Add,
+                        contentDescription = "Add",
+                        tint = MaterialTheme.colors.background
+                    )
+                }
             }
         }
-        //endregion
+
+    )
+    {
+        if (directoryPath.isNotBlank())
+            LazyColumn(
+                modifier = Modifier
+                    .padding(horizontal = Dimen.Padding.p4)
+            ){
+                //region - List View -
+                items(markdownFilesList.sortedByDescending { it.note.lastModified() })
+                {
+                    NoteListItem(
+                        item = NoteSelectionListItem(it.note,it.isSelected),
+                        onClick =
+                        {
+                            if (selectionMode)
+                                viewModel.onItemClick(it)
+                            else
+                                navController.navigate(route = Screen.AddEditNote.navArg(it.note.nameWithoutExtension))
+                        },
+                        onLongClick = { viewModel.onItemLongClick(it) }
+                    )
+                }
+                //endregion
+            }
+        else
+            MessageScreen(message = Constants.SELECT_DIRECTORY_PATH_MSG)
     }
 }
-
-
-
-
-
-
-
-
-
-    // Camera permission state
-//
-//    val storagePermissionState = rememberPermissionState(
-//        android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-//    )
-//
-//    Scaffold(Modifier.padding(top = Dimen.Padding.statusBar)) {
-//        when (storagePermissionState.status) {
-//            // If the camera permission is granted, then show screen with the feature enabled
-//            PermissionStatus.Granted -> {
-//                Text("Camera permission Granted")
-//            }
-//            is PermissionStatus.Denied -> {
-//                Column {
-//                    val textToShow = if ((storagePermissionState.status as PermissionStatus.Denied).shouldShowRationale) {
-//                        // If the user has denied the permission but the rationale can be shown,
-//                        // then gently explain why the app requires this permission
-//                        "The camera is important for this app. Please grant the permission."
-//                    } else {
-//                        // If it's the first time the user lands on this feature, or the user
-//                        // doesn't want to be asked again for this permission, explain that the
-//                        // permission is required
-//                        "Camera permission required for this feature to be available. " +
-//                                "Please grant the permission"
-//                    }
-//                    Text(textToShow)
-//                    Button(onClick = { storagePermissionState.launchPermissionRequest() }) {
-//                        Text("Request permission")
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
 

@@ -3,7 +3,7 @@
     <shortcut
         android:shortcutId="static"
         android:enabled="true"
-        android:icon="@drawable/ic_foreground_white"
+        android:icon="@mipmap/ic_launcher"
         android:shortcutShortLabel="@string/short_label">
         <intent
             android:action="android.intent.action.VIEW"

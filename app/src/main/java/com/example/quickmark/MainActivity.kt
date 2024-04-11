@@ -1,14 +1,10 @@
 package com.example.quickmark
 
-import android.Manifest
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.ShortcutInfo
-import android.content.pm.ShortcutManager
-import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -21,12 +17,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.example.flashup.ui.theme.QuickMarkTheme
 import com.example.quickmark.data.datastore.DataStoreManager
 import com.example.quickmark.domain.navigation.HomeScreenNavGraph
 import com.example.quickmark.ui.add_note_dialog.AddNoteActivity
+import com.example.quickmark.ui.theme.Constants
+import com.example.quickmark.ui.utility.MessageScreen
 import kotlinx.coroutines.launch
 
 
@@ -39,12 +36,16 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             val context = LocalContext.current
-            if (checkPermission(context))
+            if (checkPermission(context)) {
                 QuickMarkTheme {
                     HomeScreenNavGraph(navController = rememberNavController())
                 }
-            else
+            } else {
                 requestPermission(context)
+                QuickMarkTheme {
+                    MessageScreen(message = Constants.ALLOW_STORAGE_PERMISSION_MSG)
+                }
+            }
         }
     }
 
@@ -66,11 +67,10 @@ class MainActivity : ComponentActivity() {
             intent.data=Uri.parse(String.format("package:%s",applicationContext.packageName))
             context.startActivity(intent)
         } else {
-            val requestReadWritePermissionLaucher=registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){
-                    result ->
-                var count:Int=0
+            val requestReadWritePermissionLauncher=registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){ result ->
+                var count = 0
                 result.entries.forEach {
-                    if (it.value==true) {
+                    if (it.value) {
                         count++
                     }
                 }
@@ -81,7 +81,7 @@ class MainActivity : ComponentActivity() {
                 }
 
             }
-            requestReadWritePermissionLaucher.launch(arrayOf(READ_EXTERNAL_STORAGE,
+            requestReadWritePermissionLauncher.launch(arrayOf(READ_EXTERNAL_STORAGE,
                 WRITE_EXTERNAL_STORAGE))
         }
     }

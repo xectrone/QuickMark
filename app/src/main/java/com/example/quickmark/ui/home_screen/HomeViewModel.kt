@@ -16,7 +16,8 @@ import java.io.File
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val dataStoreManager: DataStoreManager = DataStoreManager.getInstance(application)
 
-    private val directoryPath = MutableStateFlow<String>("")
+    private val _directoryPath = MutableStateFlow<String>("")
+    val directoryPath: StateFlow<String> = _directoryPath
 
     private val _markdownFilesList = MutableStateFlow<List<NoteSelectionListItem>>(emptyList())
     val markdownFilesList: StateFlow<List<NoteSelectionListItem>> = _markdownFilesList
@@ -36,8 +37,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             dataStoreManager.directoryPathFlow.collect { path ->
                 if (!path.isNullOrEmpty()) {
-                    directoryPath.value = path
-                    fileHelper = FileHelper(directoryPath = directoryPath.value)
+                    _directoryPath.value = path
+                    fileHelper = FileHelper(directoryPath = _directoryPath.value)
                     startFileObserver()
                     refreshMarkdownFiles()
                 }
@@ -47,7 +48,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun startFileObserver() {
         fileObserver?.stopWatching()
-        fileObserver = object : FileObserver(File(directoryPath.value), CREATE or DELETE or MODIFY) {
+        fileObserver = object : FileObserver(File(_directoryPath.value), CREATE or DELETE or MODIFY) {
             override fun onEvent(event: Int, path: String?) {
                 viewModelScope.launch {
                     refreshMarkdownFiles()
@@ -58,7 +59,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private suspend fun refreshMarkdownFiles() {
-        val directory = File(directoryPath.value)
+        val directory = File(_directoryPath.value)
         val markdownFilesList = mutableListOf<File>()
         if (directory.exists() && directory.isDirectory) {
             directory.listFiles()?.forEach { file ->
