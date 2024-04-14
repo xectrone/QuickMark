@@ -1,6 +1,7 @@
 package com.example.quickmark.ui.add_edit_note_screen
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
@@ -27,6 +28,9 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
     private val _isNewNote = mutableStateOf<Boolean>(true)
     val isNewNote: State<Boolean> = _isNewNote
 
+    private val _isFileModified = mutableStateOf<Boolean>(true)
+    val isFileModified: State<Boolean> = _isFileModified
+
     private lateinit var fileHelper: FileHelper
 
     init {
@@ -46,10 +50,14 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
 
     fun onNoteContentChange(value:String){
         _noteContent.value = value
+        if (!isNewNote.value)
+            _isFileModified.value = fileHelper.isFileModified(fileName.value, noteTitle.value, noteContent.value)
     }
 
     fun onNoteTitleChange(value:String){
         _noteTitle.value = value
+        if (!isNewNote.value)
+            _isFileModified.value = fileHelper.isFileModified(fileName.value, noteTitle.value, noteContent.value)
     }
 
 
@@ -67,6 +75,7 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
     fun setContent() {
         _noteContent.value =  fileHelper.readMarkdownFile(fileName.value, getApplication())
         _noteTitle.value = fileName.value
+        _isFileModified.value = false
     }
 
     fun isNoteExists(value: String): Boolean{
@@ -80,6 +89,4 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
     fun setFileName(value: String){
         _fileName.value = value
     }
-
-
 }

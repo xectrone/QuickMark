@@ -61,6 +61,18 @@ class FileHelper(private val directoryPath: String) {
         return null
     }
 
+    fun isFileModified(oldFileName: String, fileName: String, content: String): Boolean {
+        val adjustedFileName = adjustFileName(fileName)
+        val adjustedOldFileName = adjustFileName(oldFileName)
+        val file = File(directoryPath, adjustedOldFileName)
+        Log.d("#TAG", "isFileModified: $adjustedFileName")
+        Log.d("#TAG", "isFileModified: $adjustedOldFileName")
+        Log.d("#TAG", "isFileModified: ${file.readText()}")
+        Log.d("#TAG", "isFileModified: $content")
+
+
+        return !(content == file.readText() && adjustedFileName == adjustedOldFileName)
+    }
 
     fun createMarkdownFile(fileName: String, content: String,context: Context) {
         val adjustedFileName = adjustFileName(fileName)
@@ -81,8 +93,6 @@ class FileHelper(private val directoryPath: String) {
         val file = File(directoryPath, adjustedFileName)
         return file.exists()
     }
-
-
 
     fun deleteMarkdownFile(fileName: String, context: Context){
         val file = File(directoryPath, fileName)

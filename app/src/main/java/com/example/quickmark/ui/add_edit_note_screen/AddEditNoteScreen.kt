@@ -57,8 +57,9 @@ fun AddEditNoteScreen(
 ) {
     val noteContent by viewModel.noteContent
     val noteTitle by viewModel.noteTitle
+    val isFileModified by viewModel.isFileModified
+    val isNewNote by viewModel.isNewNote
     var isValidFileName by remember { mutableStateOf(true) }
-    var isNewNote by remember { mutableStateOf(true) }
 
     val context = LocalContext.current
 
@@ -67,7 +68,7 @@ fun AddEditNoteScreen(
         if (fileName.isNotBlank()) {
             viewModel.setFileName(fileName)
             viewModel.setContent()
-            isNewNote = false
+            viewModel.toggleIsNewNote()
 
         }
     }
@@ -109,7 +110,7 @@ fun AddEditNoteScreen(
         //region - Floating Action Button -
         floatingActionButton =
         {
-            if (isValidFileName)
+            if (isValidFileName && isFileModified)
             {
                 FloatingActionButton(
                         modifier = Modifier
