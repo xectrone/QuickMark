@@ -64,7 +64,8 @@ fun AddEditNoteScreen(
 
     LaunchedEffect(fileName){
         if (fileName.isNotBlank()) {
-            viewModel.setContent(fileName)
+            viewModel.setFileName(fileName)
+            viewModel.setContent()
             isNewNote = false
         }
     }
@@ -90,20 +91,6 @@ fun AddEditNoteScreen(
                     )
                     { Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null) }
                 },
-//                actions = {
-//                    if(edit)
-//                        IconButton(
-//                            onClick = {
-//                                viewModel.onSaveClick(isNewNote)
-//                            }
-//                        )
-//                        { Icon(painter = painterResource(id = R.drawable.round_save_24), contentDescription = "Save Note") }
-//                    else
-//                        IconButton(
-//                            onClick = { viewModel.onEditClick() }
-//                        )
-//                        { Icon(imageVector = Icons.Rounded.Edit, contentDescription = null) }
-//                },
                 elevation = Dimen.TopBar.elevation
             )
 
@@ -130,7 +117,7 @@ fun AddEditNoteScreen(
                                     navController.navigateUp()
                                 }
                                 else
-                                    viewModel.onEditNote(fileName)
+                                    viewModel.onEditNote()
                             }
                             else{
                                 Toast.makeText(context,Constants.ExceptionToast.VALID_TITLE, Toast.LENGTH_LONG).show()

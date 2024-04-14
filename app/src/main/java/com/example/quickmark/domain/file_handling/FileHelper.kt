@@ -37,23 +37,31 @@ class FileHelper(private val directoryPath: String) {
         return content
     }
 
-    fun editMarkdownFile(oldFileName: String,fileName: String, content: String, context: Context) {
-        Log.d("#TAG", "editMarkdownFile: ")
+    fun editMarkdownFile(oldFileName: String, fileName: String, content: String, context: Context): String? {
         val adjustedFileName = adjustFileName(fileName)
         val adjustedOldFileName = adjustFileName(oldFileName)
-
         val file = File(directoryPath, adjustedOldFileName)
+
+        if (content == file.readText() && adjustedFileName == adjustedOldFileName) {
+            return null
+        }
+
         try {
             file.writeText(content)
-            file.renameTo(File(directoryPath, adjustedFileName))
+            val newFile = File(directoryPath, adjustedFileName)
+            if (file.renameTo(newFile)) {
+                return newFile.nameWithoutExtension
+            } else {
+                throw IOException("Failed to rename the file")
+            }
         } catch (e: IOException) {
             Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
         }
+        return null
     }
 
+
     fun createMarkdownFile(fileName: String, content: String,context: Context) {
-        // Check if the file name contains the .md extension
-        Log.d("#TAG", "createMarkdownFile: ")
         val adjustedFileName = adjustFileName(fileName)
         val file = File(directoryPath, adjustedFileName)
         if (file.exists()) {
@@ -86,7 +94,7 @@ class FileHelper(private val directoryPath: String) {
 
     private fun adjustFileName(fileName:String):String{
         return if (!fileName.endsWith(".md", ignoreCase = true)) {
-            "$fileName.md"
+            "${fileName.trim()}.md"
         } else {
             fileName
         }

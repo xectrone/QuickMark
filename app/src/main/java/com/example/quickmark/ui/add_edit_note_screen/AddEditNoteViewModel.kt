@@ -24,6 +24,12 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
     private val _edit = mutableStateOf<Boolean>(true)
     val edit: State<Boolean> = _edit
 
+    private val _fileName = mutableStateOf<String>("")
+    val fileName: State<String> = _fileName
+
+    private val _isNewNote = mutableStateOf<Boolean>(true)
+    val isNewNote: State<Boolean> = _isNewNote
+
     private lateinit var fileHelper: FileHelper
 
     init {
@@ -57,20 +63,32 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
     fun onCreateNote(){
         fileHelper.createMarkdownFile(noteTitle.value, noteContent.value, getApplication())
         _edit.value = false
+        toggleIsNewNote()
 
     }
 
-    fun onEditNote(oldFileName:String){
-        fileHelper.editMarkdownFile(oldFileName,noteTitle.value, noteContent.value, getApplication())
+    fun onEditNote(){
+        _fileName.value = fileHelper.editMarkdownFile(fileName.value,noteTitle.value, noteContent.value, getApplication())!!
         _edit.value = false
+        setContent()
     }
 
-    fun setContent(fileName:String) {
-        _noteContent.value =  fileHelper.readMarkdownFile(fileName, getApplication())
-        _noteTitle.value = fileName
+    fun setContent() {
+        _noteContent.value =  fileHelper.readMarkdownFile(fileName.value, getApplication())
+        _noteTitle.value = fileName.value
     }
 
-    fun isNoteExists(fileName: String): Boolean{
-        return fileHelper.isFileExists(fileName)
+    fun isNoteExists(value: String): Boolean{
+        return fileHelper.isFileExists(value)
     }
+
+    fun toggleIsNewNote(){
+        _isNewNote.value = false
+    }
+
+    fun setFileName(value: String){
+        _fileName.value = value
+    }
+
+    fun getFileName(value: String):String = fileName.value
 }
