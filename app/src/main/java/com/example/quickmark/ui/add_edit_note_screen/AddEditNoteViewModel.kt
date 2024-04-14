@@ -21,9 +21,6 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
     private val _noteTitle = mutableStateOf<String>(Util.defaultFileName())
     val noteTitle: State<String> = _noteTitle
 
-    private val _edit = mutableStateOf<Boolean>(true)
-    val edit: State<Boolean> = _edit
-
     private val _fileName = mutableStateOf<String>("")
     val fileName: State<String> = _fileName
 
@@ -55,21 +52,15 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
         _noteTitle.value = value
     }
 
-    fun onEditClick(){
-        _edit.value = true
-    }
-
 
     fun onCreateNote(){
         fileHelper.createMarkdownFile(noteTitle.value, noteContent.value, getApplication())
-        _edit.value = false
         toggleIsNewNote()
 
     }
 
     fun onEditNote(){
-        _fileName.value = fileHelper.editMarkdownFile(fileName.value,noteTitle.value, noteContent.value, getApplication())!!
-        _edit.value = false
+        fileHelper.editMarkdownFile(fileName.value,noteTitle.value, noteContent.value, getApplication())?.let { _fileName.value = it }
         setContent()
     }
 
@@ -90,5 +81,5 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
         _fileName.value = value
     }
 
-    fun getFileName(value: String):String = fileName.value
+
 }

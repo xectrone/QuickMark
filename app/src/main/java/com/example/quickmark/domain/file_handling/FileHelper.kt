@@ -43,6 +43,7 @@ class FileHelper(private val directoryPath: String) {
         val file = File(directoryPath, adjustedOldFileName)
 
         if (content == file.readText() && adjustedFileName == adjustedOldFileName) {
+            Toast.makeText(context, Constants.ExceptionToast.NO_CHANGES, Toast.LENGTH_SHORT).show()
             return null
         }
 

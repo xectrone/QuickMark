@@ -2,11 +2,16 @@ package com.example.quickmark.ui.add_edit_note_screen
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -41,6 +46,7 @@ import com.example.quickmark.ui.theme.Constants
 import com.example.quickmark.ui.theme.CustomTypography
 import com.example.quickmark.ui.theme.Dimen
 import com.example.quickmark.ui.theme.LocalCustomColorPalette
+import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -51,24 +57,27 @@ fun AddEditNoteScreen(
 ) {
     val noteContent by viewModel.noteContent
     val noteTitle by viewModel.noteTitle
-    val edit by viewModel.edit
     var isValidFileName by remember { mutableStateOf(true) }
     var isNewNote by remember { mutableStateOf(true) }
 
     val context = LocalContext.current
 
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
-
     LaunchedEffect(fileName){
         if (fileName.isNotBlank()) {
             viewModel.setFileName(fileName)
             viewModel.setContent()
             isNewNote = false
+
         }
     }
+    LaunchedEffect(Unit) {
+        if (isNewNote){
+            delay(200)
+            focusRequester.requestFocus()
+        }
+    }
+
 
 
     Scaffold(
@@ -102,9 +111,7 @@ fun AddEditNoteScreen(
         {
             if (isValidFileName)
             {
-                if(edit)
-                {
-                    FloatingActionButton(
+                FloatingActionButton(
                         modifier = Modifier
                             .imePadding()
                             .padding(end = Dimen.Padding.p4, bottom = Dimen.Padding.p5),
@@ -132,30 +139,10 @@ fun AddEditNoteScreen(
 
                         )
                     }
-                }
-                else
-                {
-                    FloatingActionButton(
-                        modifier = Modifier
-                            .imePadding()
-                            .padding(end = Dimen.Padding.p4, bottom = Dimen.Padding.p5),
-                        backgroundColor = LocalCustomColorPalette.current.accent,
-                        onClick =
-                        {
-                            viewModel.onEditClick()
-                        }
-                    )
-                    {
-                        Icon(imageVector = Icons.Rounded.Edit,
-                            contentDescription = "Add",
-                            tint = LocalCustomColorPalette.current.background
-
-
-                        )
-                    }
-                }
-
             }
+
+
+
 
         }
         //endregion
@@ -164,6 +151,8 @@ fun AddEditNoteScreen(
         Column(
             modifier = Modifier
                 .padding(horizontal = Dimen.Padding.p4)
+                .verticalScroll( state = rememberScrollState(), reverseScrolling  = true)
+                .imePadding()
         ) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
@@ -176,7 +165,6 @@ fun AddEditNoteScreen(
                         Util.isValidFileName(it)
                                 },
                 textStyle = CustomTypography.title,
-                readOnly = !edit,
                 isError = !isValidFileName,
                 placeholder ={
                      Text(
@@ -195,7 +183,6 @@ fun AddEditNoteScreen(
                 ),
                 trailingIcon = {
                     IconButton(
-                        enabled = edit,
                         onClick = { viewModel.onNoteTitleChange("") }
                     ) {
                         Icon(imageVector = Icons.Rounded.Clear, contentDescription ="Clear Note Title", tint = LocalCustomColorPalette.current.primary.copy(0.4f))
@@ -210,7 +197,6 @@ fun AddEditNoteScreen(
                 value = noteContent,
                 onValueChange = { viewModel.onNoteContentChange(it)},
                 textStyle = CustomTypography.body,
-                readOnly = !edit,
                 placeholder ={
                     Text(
                         text = "Type here...",
