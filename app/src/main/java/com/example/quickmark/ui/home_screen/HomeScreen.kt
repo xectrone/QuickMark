@@ -61,19 +61,19 @@ fun HomeScreen(
 //                            scope.launch { scaffoldState.drawerState.open() }
                         }
                     )
-                    { Icon(imageVector = Icons.Rounded.Menu, contentDescription = null) }
+                    { Icon(imageVector = Icons.Rounded.Menu, contentDescription = Constants.Labels.HomeScreen.MENU) }
                 },
                 actions = {
                     if(selectionMode) {
                         IconButton(
                             onClick = { viewModel.onDelete() }
                         )
-                        { Icon(imageVector = Icons.Rounded.Delete, contentDescription = null) }
+                        { Icon(imageVector = Icons.Rounded.Delete, contentDescription = Constants.Labels.HomeScreen.DELETE) }
 
                         IconButton(
                             onClick = { viewModel.onClear() }
                         )
-                        { Icon(imageVector = Icons.Rounded.Clear, contentDescription = null) }
+                        { Icon(imageVector = Icons.Rounded.Clear, contentDescription = Constants.Labels.HomeScreen.CLEAR) }
                     }
 
                     IconButton(
@@ -82,7 +82,7 @@ fun HomeScreen(
                             navController.navigate(Screen.Setting.route)
                         }
                     )
-                    { Icon(imageVector = Icons.Rounded.Settings, contentDescription = null) }
+                    { Icon(imageVector = Icons.Rounded.Settings, contentDescription = Constants.Labels.HomeScreen.SETTINGS) }
                 },
 
                 elevation = Dimen.TopBar.elevation
@@ -102,7 +102,7 @@ fun HomeScreen(
                 {
                     Icon(
                         imageVector = Icons.Rounded.Add,
-                        contentDescription = "Add",
+                        contentDescription = Constants.Labels.HomeScreen.ADD,
                         tint = MaterialTheme.colors.background
                     )
                 }

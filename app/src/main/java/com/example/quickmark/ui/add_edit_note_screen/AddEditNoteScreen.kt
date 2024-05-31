@@ -2,9 +2,6 @@ package com.example.quickmark.ui.add_edit_note_screen
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +21,6 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,7 +34,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.quickmark.R
 import com.example.quickmark.data.Util
@@ -99,7 +94,7 @@ fun AddEditNoteScreen(
                             navController.navigateUp()
                         }
                     )
-                    { Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null) }
+                    { Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = Constants.Labels.BACK) }
                 },
                 elevation = Dimen.TopBar.elevation
             )
@@ -135,7 +130,7 @@ fun AddEditNoteScreen(
                     )
                     {
                         Icon(painter = painterResource(id = R.drawable.round_save_24),
-                            contentDescription = "Add",
+                            contentDescription = Constants.Labels.AddEdit.SAVE,
                             tint = LocalCustomColorPalette.current.background
 
                         )
@@ -186,7 +181,7 @@ fun AddEditNoteScreen(
                     IconButton(
                         onClick = { viewModel.onNoteTitleChange("") }
                     ) {
-                        Icon(imageVector = Icons.Rounded.Clear, contentDescription ="Clear Note Title", tint = LocalCustomColorPalette.current.primary.copy(0.4f))
+                        Icon(imageVector = Icons.Rounded.Clear, contentDescription =Constants.Labels.AddEdit.CLEAR, tint = LocalCustomColorPalette.current.primary.copy(0.4f))
                     }
                 }
             )

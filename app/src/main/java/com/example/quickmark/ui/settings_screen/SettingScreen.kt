@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
@@ -40,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.example.quickmark.R
 import com.example.quickmark.ui.add_note_dialog.add_note_dialog_shortcut.addHomeScreenShortcut
+import com.example.quickmark.ui.theme.Constants
 import com.example.quickmark.ui.theme.CustomShape
 import com.example.quickmark.ui.theme.CustomTypography
 import com.example.quickmark.ui.theme.Dimen
@@ -108,7 +108,7 @@ fun SettingsScreen(
                             navController.navigateUp()
                         }
                     )
-                    { Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null) }
+                    { Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = Constants.Labels.BACK) }
                 },
                 elevation = Dimen.TopBar.elevation
             )
@@ -139,13 +139,13 @@ fun SettingsScreen(
                     if(editDirectoryPath)
                         IconButton(onClick = { viewModel.onSaveDirectoryPathClick()}) {
                             Icon(painter = painterResource(id = R.drawable.round_save_24),
-                                contentDescription = "Save Directory Path")
+                                contentDescription = Constants.Labels.SettingScreen.SAVE_DIRECTORY_PATH)
                         }
                     else
                         IconButton(onClick = { viewModel.onEditDirectoryPathClick() }) {
                             Icon(
                                 imageVector = Icons.Rounded.Edit,
-                                contentDescription = "Edit Directory Path"
+                                contentDescription = Constants.Labels.SettingScreen.EDIT_DIRECTORY_PATH
                             )
                         }
 

@@ -11,4 +11,26 @@ object Constants {
         const val NO_CHANGES = "No changes made to the file."
 
     }
+
+    object Labels {
+        const val BACK = "Navigate to previous screen"
+        object HomeScreen{
+            const val MENU = "Open Application Drawer"
+            const val DELETE = "Delete Selected Notes"
+            const val CLEAR = "Clear Selection"
+            const val SETTINGS = "Open Settings"
+            const val ADD = "Add New Note"
+        }
+
+        object SettingScreen{
+            const val EDIT_DIRECTORY_PATH = "Edit Directory Path"
+            const val SAVE_DIRECTORY_PATH = "Save Directory Path"
+        }
+
+        object AddEdit{
+            const val CLEAR = "Clear Note Title"
+            const val SAVE = "Save"
+        }
+
+    }
 }

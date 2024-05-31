@@ -106,7 +106,7 @@ fun AddNoteDialog(
                     textStyle = MaterialTheme.typography.subtitle2,
                     trailingIcon = {
                         IconButton(onClick = { viewModel.onNoteTitleChange("") }) {
-                            Icon(modifier= Modifier.size(18.dp) ,imageVector = Icons.Rounded.Clear, contentDescription ="Clear Note Title", tint = LocalCustomColorPalette.current.primary.copy(0.4f))
+                            Icon(modifier= Modifier.size(18.dp) ,imageVector = Icons.Rounded.Clear, contentDescription = Constants.Labels.AddEdit.CLEAR, tint = LocalCustomColorPalette.current.primary.copy(0.4f))
                         }
                     },
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
