@@ -1,6 +1,7 @@
 package com.example.quickmark.ui.home_screen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,9 +19,12 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.quickmark.ui.theme.Dimen
@@ -37,9 +41,14 @@ fun HomeScreen(
     viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     navController: NavHostController
 ) {
+    val context = LocalContext.current
     val markdownFilesList by viewModel.markdownFilesList.collectAsStateWithLifecycle(emptyList())
     val selectionMode by viewModel.selectionMode
-    val directoryPath by viewModel.directoryPath.collectAsStateWithLifecycle("NONE")
+    val directoryUri by viewModel.directoryUri
+
+    LaunchedEffect(key1 = true){
+        viewModel.observeDirectoryUri()
+    }
 
     Scaffold(
         backgroundColor = LocalCustomColorPalette.current.background,
@@ -90,7 +99,7 @@ fun HomeScreen(
 
         },
         floatingActionButton = {
-            if (directoryPath.isNotBlank())
+            if (directoryUri != null)
             {
                 FloatingActionButton(
                     modifier = Modifier.padding(end = Dimen.Padding.p4, bottom = Dimen.Padding.p5),
@@ -111,24 +120,26 @@ fun HomeScreen(
 
     )
     {
-        if (directoryPath.isNotBlank())
+        if (directoryUri != null)
             LazyColumn(
                 modifier = Modifier
                     .padding(horizontal = Dimen.Padding.p4)
             ){
                 //region - List View -
-                items(markdownFilesList.sortedByDescending { it.note.lastModified() })
+                items(markdownFilesList)
                 {
                     NoteListItem(
-                        item = NoteSelectionListItem(it.note,it.isSelected),
+                        item = NoteSelectionListItem(note = it.note, fileUri = it.fileUri, isSelected = it.isSelected),
                         onClick =
                         {
+
                             if (selectionMode)
                                 viewModel.onItemClick(it)
                             else
-                                navController.navigate(route = Screen.AddEditNote.navArg(it.note.nameWithoutExtension))
+                                navController.navigate(route = Screen.AddEditNote.navArg(it.fileUri))
                         },
-                        onLongClick = { viewModel.onItemLongClick(it) }
+                        onLongClick = { viewModel.onItemLongClick(it) },
+                        context = context
                     )
                 }
                 //endregion

@@ -6,10 +6,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.quickmark.domain.Util
 import com.example.quickmark.ui.add_edit_note_screen.AddEditNoteScreen
 import com.example.quickmark.ui.home_screen.HomeScreen
 import com.example.quickmark.ui.settings_screen.SettingsScreen
-import com.example.quickmark.ui.theme.Constants.FILE_NAME
+import com.example.quickmark.ui.theme.Constants.FILE_URI
 
 @Composable
 fun HomeScreenNavGraph(navController: NavHostController)
@@ -24,11 +25,11 @@ fun HomeScreenNavGraph(navController: NavHostController)
         }
         composable(route = Screen.AddEditNote.full,
             arguments = listOf(
-                navArgument(FILE_NAME) {
+                navArgument(FILE_URI) {
                     type = NavType.StringType
                     defaultValue = "" }))
         {
-            AddEditNoteScreen(fileName = it.arguments!!.getString(FILE_NAME)!!,navController = navController)
+            AddEditNoteScreen(fileUri = Util.decodeUri(it.arguments!!.getString(FILE_URI)!!),navController = navController)
         }
     }
 }

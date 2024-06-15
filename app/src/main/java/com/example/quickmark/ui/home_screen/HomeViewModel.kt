@@ -1,23 +1,23 @@
 package com.example.quickmark.ui.home_screen
 
 import android.app.Application
-import android.os.FileObserver
+import android.content.ContentResolver
+import android.database.ContentObserver
+import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.quickmark.data.datastore.DataStoreManager
-import com.example.quickmark.domain.file_handling.FileHelper
+import com.example.quickmark.domain.file_handling.DataStore.getSavedDirectoryUri
+import com.example.quickmark.domain.file_handling.SAFFileHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.io.File
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
-    private val dataStoreManager: DataStoreManager = DataStoreManager.getInstance(application)
 
-    private val _directoryPath = MutableStateFlow<String>("")
-    val directoryPath: StateFlow<String> = _directoryPath
+    private val _directoryUri = mutableStateOf<Uri?>(null)
+    val directoryUri: State<Uri?> = _directoryUri
 
     private val _markdownFilesList = MutableStateFlow<List<NoteSelectionListItem>>(emptyList())
     val markdownFilesList: StateFlow<List<NoteSelectionListItem>> = _markdownFilesList
@@ -25,63 +25,35 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectionMode = mutableStateOf(false)
     val selectionMode: State<Boolean> = _selectionMode
 
-    private var fileObserver: FileObserver? = null
-    private lateinit var fileHelper: FileHelper
-
-
     init {
-        observeDirectoryPath()
+        observeDirectoryUri()
     }
 
-    private fun observeDirectoryPath() {
+    fun observeDirectoryUri() {
         viewModelScope.launch {
-            dataStoreManager.directoryPathFlow.collect { path ->
-                if (!path.isNullOrEmpty()) {
-                    _directoryPath.value = path
-                    fileHelper = FileHelper(directoryPath = _directoryPath.value)
-                    startFileObserver()
+            getSavedDirectoryUri(getApplication())?.let{ uri ->
+                _directoryUri.value = uri
+                uri?.let {
                     refreshMarkdownFiles()
                 }
             }
         }
     }
 
-    private fun startFileObserver() {
-        fileObserver?.stopWatching()
-        fileObserver = object : FileObserver(File(_directoryPath.value), CREATE or DELETE or MODIFY) {
-            override fun onEvent(event: Int, path: String?) {
-                viewModelScope.launch {
-                    refreshMarkdownFiles()
-                }
-            }
+    fun refreshMarkdownFiles() {
+        directoryUri.value?.let{uri ->
+            val markdownFilesList = SAFFileHelper.getAllMarkdownFiles(directoryUri = uri, context = getApplication())
+            _markdownFilesList.value = markdownFilesList.map{ NoteSelectionListItem(note = SAFFileHelper.getFile(it, getApplication()), fileUri = it)}
         }
-        fileObserver?.startWatching()
-    }
-
-    private suspend fun refreshMarkdownFiles() {
-        val directory = File(_directoryPath.value)
-        val markdownFilesList = mutableListOf<File>()
-        if (directory.exists() && directory.isDirectory) {
-            directory.listFiles()?.forEach { file ->
-                if (file.isFile && file.extension.equals("md", ignoreCase = true)) {
-                    markdownFilesList.add(file)
-                }
-            }
-        }
-        _markdownFilesList.value = markdownFilesList.map { NoteSelectionListItem(it) }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        fileObserver?.stopWatching()
     }
 
     fun onDelete() {
         viewModelScope.launch {
             markdownFilesList.value.filter { it.isSelected }
-                .forEach { item -> fileHelper.deleteMarkdownFile(item.note.name, getApplication()) }
+                .forEach { item -> SAFFileHelper.deleteFile(fileUri = item.fileUri, context = getApplication()) }
             _selectionMode.value = false
         }
+        refreshMarkdownFiles()
     }
 
     fun onItemClick(item: NoteSelectionListItem) {
@@ -97,9 +69,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun onClear(){
-        if(selectionMode.value){
-            _markdownFilesList.value = _markdownFilesList.value.map { NoteSelectionListItem(it.note) }
+    fun onClear() {
+        if (selectionMode.value) {
+            _markdownFilesList.value = _markdownFilesList.value.map { NoteSelectionListItem(note = it.note, fileUri = it.fileUri) }
             _selectionMode.value = false
         }
     }

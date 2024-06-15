@@ -1,4 +1,5 @@
 package com.example.quickmark.ui.home_screen
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
@@ -12,13 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.ui.Alignment
 import com.example.quickmark.ui.theme.Dimen
-import com.example.quickmark.data.Util
+import com.example.quickmark.domain.Util
 import com.example.quickmark.ui.theme.CustomTypography
 import com.example.quickmark.ui.theme.LocalCustomColorPalette
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NoteListItem(item: NoteSelectionListItem, onClick:()->Unit, onLongClick:()->Unit)
+fun NoteListItem(item: NoteSelectionListItem, context: Context, onClick:()->Unit, onLongClick:()->Unit)
 {
     Card(
         modifier = Modifier

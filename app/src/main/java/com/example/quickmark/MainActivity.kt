@@ -28,67 +28,16 @@ import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_QuickMark)
-
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            val context = LocalContext.current
-            if (checkPermission(context)) {
-                QuickMarkTheme {
-                    HomeScreenNavGraph(navController = rememberNavController())
-                }
-            } else {
-                requestPermission(context)
-                QuickMarkTheme {
-                    MessageScreen(message = Constants.ALLOW_STORAGE_PERMISSION_MSG)
-                }
+            QuickMarkTheme {
+                HomeScreenNavGraph(navController = rememberNavController())
             }
+
         }
     }
-
-    //region - Permission -
-    private fun checkPermission(context: Context):Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Environment.isExternalStorageManager()
-        } else {
-            val readFile=ContextCompat.checkSelfPermission(context, READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED
-            val writFile=ContextCompat.checkSelfPermission(context, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED
-            readFile && writFile
-        }
-
-    }
-    private fun requestPermission(context: Context){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val intent =Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-            intent.addCategory("android.intent.category.DEFAULT")
-            intent.data=Uri.parse(String.format("package:%s",applicationContext.packageName))
-            context.startActivity(intent)
-        } else {
-            val requestReadWritePermissionLauncher=registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){ result ->
-                var count = 0
-                result.entries.forEach {
-                    if (it.value) {
-                        count++
-                    }
-                }
-                if (count==2) {
-                    Toast.makeText(context,"Permission Granted",Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context,"Permission not Granted",Toast.LENGTH_SHORT).show()
-                }
-
-            }
-            requestReadWritePermissionLauncher.launch(arrayOf(READ_EXTERNAL_STORAGE,
-                WRITE_EXTERNAL_STORAGE))
-        }
-    }
-    //endregion
-
-
-
 
 }
 

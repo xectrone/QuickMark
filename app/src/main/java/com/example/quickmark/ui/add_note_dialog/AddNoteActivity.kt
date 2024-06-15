@@ -12,7 +12,6 @@ class AddNoteActivity : ComponentActivity() {
         setContent {
             QuickMarkTheme {
                 AddNoteDialog() { finish() }
-//                finish()
             }
         }
     }

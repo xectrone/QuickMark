@@ -1,20 +1,19 @@
 package com.example.quickmark.ui.add_edit_note_screen
 
 import android.app.Application
-import android.util.Log
+import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.quickmark.data.Util
+import com.example.quickmark.domain.Util
 import com.example.quickmark.data.datastore.DataStoreManager
+import com.example.quickmark.domain.file_handling.DataStore.getSavedDirectoryUri
 import com.example.quickmark.domain.file_handling.FileHelper
+import com.example.quickmark.domain.file_handling.SAFFileHelper
 import kotlinx.coroutines.launch
 
 class AddEditNoteViewModel(application: Application): AndroidViewModel(application) {
-    private val dataStoreManager: DataStoreManager = DataStoreManager.getInstance(application)
-
-    private val directoryPath = mutableStateOf<String>("")
 
     private val _noteContent = mutableStateOf<String>("")
     val noteContent: State<String> = _noteContent
@@ -25,68 +24,74 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
     private val _fileName = mutableStateOf<String>("")
     val fileName: State<String> = _fileName
 
+    private val _fileUri = mutableStateOf<Uri?>(null)
+    val fileUri: State<Uri?> = _fileUri
+
     private val _isNewNote = mutableStateOf<Boolean>(true)
     val isNewNote: State<Boolean> = _isNewNote
 
     private val _isFileModified = mutableStateOf<Boolean>(true)
     val isFileModified: State<Boolean> = _isFileModified
 
-    private lateinit var fileHelper: FileHelper
+    private val _directoryUri = mutableStateOf<Uri?>(null)
+    val directoryUri: State<Uri?> = _directoryUri
 
     init {
-        getDirectoryPath()
+        observeDirectoryUri()
     }
 
-    private fun getDirectoryPath() {
+    private fun observeDirectoryUri() {
         viewModelScope.launch {
-            dataStoreManager.directoryPathFlow.collect { path ->
-                if (!path.isNullOrEmpty()) {
-                    directoryPath.value = path
-                    fileHelper = FileHelper(directoryPath = directoryPath.value)
-                }
+            getSavedDirectoryUri(getApplication())?.let{ uri ->
+                _directoryUri.value = uri
             }
         }
     }
 
+
     fun onNoteContentChange(value:String){
         _noteContent.value = value
         if (!isNewNote.value)
-            _isFileModified.value = fileHelper.isFileModified(fileName.value, noteTitle.value, noteContent.value)
+            _isFileModified.value = fileUri.value?.let { SAFFileHelper.isFileModified(newFileName = noteTitle.value, newFileContent = noteContent.value, fileUri = it, context = getApplication())}?:false
     }
 
     fun onNoteTitleChange(value:String){
         _noteTitle.value = value
         if (!isNewNote.value)
-            _isFileModified.value = fileHelper.isFileModified(fileName.value, noteTitle.value, noteContent.value)
+            _isFileModified.value = fileUri.value?.let { SAFFileHelper.isFileModified(newFileName = noteTitle.value, newFileContent = noteContent.value, fileUri = it, context = getApplication())}?:false
     }
 
 
     fun onCreateNote(){
-        fileHelper.createMarkdownFile(noteTitle.value, noteContent.value, getApplication())
-        toggleIsNewNote()
-
+        directoryUri.value?.let { SAFFileHelper.createFile(fileName = noteTitle.value, context = getApplication(), directoryUri = it, content = noteContent.value) }
     }
 
     fun onEditNote(){
-        fileHelper.editMarkdownFile(fileName.value,noteTitle.value, noteContent.value, getApplication())?.let { _fileName.value = it }
+        fileUri.value?.let { _fileUri.value = SAFFileHelper.editFile(context = getApplication(), fileUri = it, newFileName = noteTitle.value, newFileContent = noteContent.value) }
+        fileUri.value?.let { _fileName.value = noteTitle.value }
         setContent()
     }
 
     fun setContent() {
-        _noteContent.value =  fileHelper.readMarkdownFile(fileName.value, getApplication())
-        _noteTitle.value = fileName.value
+        fileUri.value?.let {_noteContent.value = SAFFileHelper.getFileContent(fileUri = it, context = getApplication())}
+        fileUri.value?.let {_noteTitle.value = SAFFileHelper.getFileName(fileUri = it,context = getApplication())}
+        fileUri.value?.let {_fileName.value = SAFFileHelper.getFileName(fileUri = it,context = getApplication())}
         _isFileModified.value = false
     }
 
-    fun isNoteExists(value: String): Boolean{
-        return fileHelper.isFileExists(value)
+    fun isNoteExists(): Boolean{
+        if (noteTitle.value == fileName.value)
+            return false
+        val isExists = directoryUri.value?.let { it1 -> SAFFileHelper.isFileExists(newFileName = noteTitle.value, directoryUri = it1, context = getApplication()) }
+        return isExists?:true
     }
 
     fun toggleIsNewNote(){
         _isNewNote.value = false
+        _isFileModified.value = false
     }
 
-    fun setFileName(value: String){
-        _fileName.value = value
+    fun setFileUri(fileUri: String){
+        _fileUri.value = Uri.parse(fileUri)
     }
 }

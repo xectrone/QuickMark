@@ -1,6 +1,8 @@
 package com.example.quickmark.ui.add_edit_note_screen
 
 import android.annotation.SuppressLint
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,7 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.navigation.NavController
 import com.example.quickmark.R
-import com.example.quickmark.data.Util
+import com.example.quickmark.domain.Util
 import com.example.quickmark.ui.theme.Constants
 import com.example.quickmark.ui.theme.CustomTypography
 import com.example.quickmark.ui.theme.Dimen
@@ -46,7 +48,7 @@ import kotlinx.coroutines.delay
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AddEditNoteScreen(
-    fileName: String,
+    fileUri: Uri?,
     navController: NavController,
     viewModel: AddEditNoteViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
@@ -59,13 +61,13 @@ fun AddEditNoteScreen(
     val context = LocalContext.current
 
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(fileName){
-        if (fileName.isNotBlank()) {
-            viewModel.setFileName(fileName)
+    LaunchedEffect(fileUri){
+        if (fileUri != null) {
+            viewModel.setFileUri(fileUri = fileUri.toString())
             viewModel.setContent()
             viewModel.toggleIsNewNote()
-
         }
+
     }
     LaunchedEffect(Unit) {
         if (isNewNote){
@@ -147,7 +149,7 @@ fun AddEditNoteScreen(
         Column(
             modifier = Modifier
                 .padding(horizontal = Dimen.Padding.p4)
-                .verticalScroll( state = rememberScrollState(), reverseScrolling  = true)
+                .verticalScroll(state = rememberScrollState(), reverseScrolling = true)
                 .imePadding()
         ) {
             TextField(
@@ -155,10 +157,7 @@ fun AddEditNoteScreen(
                 value = noteTitle,
                 onValueChange = {
                     viewModel.onNoteTitleChange(it)
-                    isValidFileName = if(isNewNote)
-                        (Util.isValidFileName(it) && !viewModel.isNoteExists(it))
-                    else
-                        Util.isValidFileName(it)
+                    isValidFileName = Util.isValidFileName(it) && !viewModel.isNoteExists()
                                 },
                 textStyle = CustomTypography.title,
                 isError = !isValidFileName,

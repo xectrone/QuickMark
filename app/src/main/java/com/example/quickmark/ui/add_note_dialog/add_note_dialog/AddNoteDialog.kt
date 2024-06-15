@@ -1,6 +1,7 @@
 package com.example.quickmark.ui.add_note_dialog.add_note_dialog
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -15,12 +16,14 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.quickmark.data.Util
+import com.example.quickmark.R
+import com.example.quickmark.domain.Util
 import com.example.quickmark.ui.theme.Dimen
 import com.example.quickmark.ui.theme.Constants
 import com.example.quickmark.ui.theme.LocalCustomColorPalette
@@ -122,23 +125,30 @@ fun AddNoteDialog(
                     placeholder = { Text("Write here...") },
                     colors = textFieldColor,
                     textStyle = MaterialTheme.typography.subtitle1.copy(fontSize = 16.sp),
-                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { onDone() }),
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(
-                    shape = RoundedCornerShape(Dimen.Padding.p2),
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = LocalCustomColorPalette.current.primary,
-                        contentColor = LocalCustomColorPalette.current.backgroundSecondary
-                    ),
+                IconButton(
+                    modifier = Modifier
+                        .align(Alignment.End),
                     enabled = isValidFileName,
-                    onClick = { onDone() }
+                    onClick = {  onDone() }
                 ) {
-                    Text(text = "Done")
+                    Icon(painter = painterResource(id = R.drawable.baseline_send_24), contentDescription = Constants.Labels.AddEdit.SAVE, tint = LocalCustomColorPalette.current.accent)
                 }
+
+//                Button(
+//                    shape = RoundedCornerShape(Dimen.Padding.p2),
+//                    colors = ButtonDefaults.buttonColors(
+//                        backgroundColor = LocalCustomColorPalette.current.primary,
+//                        contentColor = LocalCustomColorPalette.current.backgroundSecondary
+//                    ),
+//                    enabled = isValidFileName,
+//                    onClick = { onDone() }
+//                ) {
+//                    Text(text = "Done", color = LocalCustomColorPalette.current.primary)
+//                }
             }
         }
     }
