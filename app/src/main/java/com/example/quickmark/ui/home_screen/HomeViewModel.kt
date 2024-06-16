@@ -1,8 +1,6 @@
 package com.example.quickmark.ui.home_screen
 
 import android.app.Application
-import android.content.ContentResolver
-import android.database.ContentObserver
 import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +49,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             SAFFileHelper.deleteSelectedFiles(noteSelectionListItems = markdownFilesList.value, context =  getApplication())
             refreshMarkdownFiles()
         }
+        _selectionMode.value = false
     }
 
     fun onItemClick(item: NoteSelectionListItem) {

@@ -1,7 +1,6 @@
 package com.example.quickmark.ui.home_screen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,9 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.quickmark.ui.theme.Dimen
@@ -45,8 +42,8 @@ fun HomeScreen(
     val selectionMode by viewModel.selectionMode
     val directoryUri by viewModel.directoryUri
 
-    LaunchedEffect(key1 = true){
-        viewModel.refreshMarkdownFiles()
+    LaunchedEffect(key1 = navController.currentBackStackEntry) {
+        viewModel.observeDirectoryUri()
     }
 
     Scaffold(

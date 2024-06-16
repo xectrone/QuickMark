@@ -7,9 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.quickmark.domain.Util
-import com.example.quickmark.data.datastore.DataStoreManager
 import com.example.quickmark.domain.file_handling.DataStore
-import com.example.quickmark.domain.file_handling.FileHelper
 import com.example.quickmark.domain.file_handling.SAFFileHelper
 import kotlinx.coroutines.launch
 

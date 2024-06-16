@@ -2,8 +2,7 @@ package com.example.quickmark.ui.theme
 
 object Constants {
     const val FILE_URI = "FILE_URI"
-    const val ALLOW_STORAGE_PERMISSION_MSG = "Please allow storage permission for app functionality. If you've granted permission, please restart the app for changes to take effect."
-    const val SELECT_DIRECTORY_PATH_MSG = "Please go to settings and select the directory path where you want to store your notes."
+    const val SELECT_DIRECTORY_PATH_MSG = "Please go to Settings and select the note folder where you want to store your notes."
     object ExceptionToast{
         const val FILE_ALREADY_EXIST = "File with the same name already exists. Please choose a different name."
         const val GENERAL = "Something is wrong!"
