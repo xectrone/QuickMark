@@ -41,13 +41,12 @@ fun HomeScreen(
     viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     navController: NavHostController
 ) {
-    val context = LocalContext.current
     val markdownFilesList by viewModel.markdownFilesList.collectAsStateWithLifecycle(emptyList())
     val selectionMode by viewModel.selectionMode
     val directoryUri by viewModel.directoryUri
 
     LaunchedEffect(key1 = true){
-        viewModel.observeDirectoryUri()
+        viewModel.refreshMarkdownFiles()
     }
 
     Scaffold(
@@ -129,7 +128,7 @@ fun HomeScreen(
                 items(markdownFilesList)
                 {
                     NoteListItem(
-                        item = NoteSelectionListItem(note = it.note, fileUri = it.fileUri, isSelected = it.isSelected),
+                        item = NoteSelectionListItem(fileName = it.fileName, fileContent = it.fileContent, fileUri = it.fileUri, lastModified = it.lastModified, isSelected = it.isSelected),
                         onClick =
                         {
 
@@ -139,7 +138,6 @@ fun HomeScreen(
                                 navController.navigate(route = Screen.AddEditNote.navArg(it.fileUri))
                         },
                         onLongClick = { viewModel.onItemLongClick(it) },
-                        context = context
                     )
                 }
                 //endregion

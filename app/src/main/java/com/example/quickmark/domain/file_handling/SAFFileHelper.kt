@@ -7,14 +7,16 @@ import android.net.Uri
 import android.provider.DocumentsContract
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
-import com.example.quickmark.ui.theme.Constants
+import com.example.quickmark.ui.home_screen.NoteSelectionListItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.io.OutputStream
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 object SAFFileHelper {
     fun getAllMarkdownFiles(directoryUri: Uri, context: Context): List<Uri> {
@@ -185,65 +187,6 @@ object SAFFileHelper {
         val documentFile = DocumentFile.fromSingleUri(context, fileUri)
         return documentFile?.name?.substringBeforeLast(".md") ?: ""
     }
-    // Read a markdown file
-
-
-    // Edit a markdown file
-
-
-    fun renameFile(newFileName: String, fileUri: Uri, context: Context): Uri? {
-        val contentResolver = context.contentResolver
-
-        // Ensure the new file name ends with ".md"
-        val newFileNameWithExtension = if (newFileName.endsWith(".md", ignoreCase = true)) {
-            newFileName.trim()
-        } else {
-            "$newFileName.md"
-        }
-
-        // Get the parent directory Uri
-        val parentUri = DocumentsContract.buildDocumentUriUsingTree(
-            fileUri,
-            DocumentsContract.getTreeDocumentId(fileUri)
-        )
-
-        // Create the new file with the new name
-        val newFileUri = DocumentsContract.createDocument(
-            contentResolver,
-            parentUri,
-            "text/markdown",
-            newFileNameWithExtension
-        ) ?: return null // Return null if the creation fails
-
-        return try {
-            // Copy the contents from the old file to the new file
-            contentResolver.openInputStream(fileUri)?.use { inputStream ->
-                contentResolver.openOutputStream(newFileUri)?.use { outputStream ->
-                    copyStream(inputStream, outputStream)
-                }
-            }
-
-            // Delete the old file
-            DocumentsContract.deleteDocument(contentResolver, fileUri)
-
-            // Return the Uri of the newly created file
-            newFileUri
-        } catch (e: Exception) {
-            // If something goes wrong, delete the new file and return null
-            DocumentsContract.deleteDocument(contentResolver, newFileUri)
-            e.printStackTrace()
-            null
-        }
-    }
-
-    private fun copyStream(input: InputStream, output: OutputStream) {
-        val buffer = ByteArray(1024)
-        var bytesRead: Int
-        while (input.read(buffer).also { bytesRead = it } != -1) {
-            output.write(buffer, 0, bytesRead)
-        }
-        output.flush()
-    }
 
     fun getFileContent(fileUri: Uri, context: Context): String {
         return try {
@@ -259,35 +202,6 @@ object SAFFileHelper {
         }
     }
 
-    // Check if a file is modified
-
-
-
-
-
-    // Delete a markdown file
-
-
-    // Helper method to write content to a URI
-    private fun writeToUri(content: String, fileUri: Uri, context: Context) {
-        context.contentResolver.openOutputStream(fileUri)?.use { outputStream ->
-            outputStream.writer().use { it.write(content) }
-        }
-    }
-
-    // Helper method to get document display name from URI
-    private fun getDocumentName(fileUri: Uri, context:Context): String {
-        val contentResolver: ContentResolver = context.contentResolver
-        val cursor = contentResolver.query(fileUri, arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME), null, null, null)
-        var name = ""
-        cursor?.use {
-            if (it.moveToFirst()) {
-                name = it.getString(0)
-            }
-        }
-        return name
-    }
-
     fun isFileModified(newFileName: String, newFileContent:String, fileUri: Uri, context: Context): Boolean {
         if (newFileContent != getFileContent(fileUri = fileUri, context = context))
             return true
@@ -295,4 +209,83 @@ object SAFFileHelper {
             return true
         return false
     }
+
+    suspend fun getMarkdownFilesFromDirectory(directoryUri: Uri, context: Context): List<NoteSelectionListItem> = withContext(
+        Dispatchers.IO) {
+        val contentResolver = context.contentResolver
+        val markdownFiles = mutableListOf<NoteSelectionListItem>()
+
+        // Query to get the list of documents in the directory
+        val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
+            directoryUri,
+            DocumentsContract.getTreeDocumentId(directoryUri)
+        )
+
+        val cursor = contentResolver.query(
+            childrenUri,
+            arrayOf(DocumentsContract.Document.COLUMN_DOCUMENT_ID, DocumentsContract.Document.COLUMN_DISPLAY_NAME, DocumentsContract.Document.COLUMN_LAST_MODIFIED),
+            null,
+            null,
+            null
+        )
+
+        cursor?.use {
+            while (it.moveToNext()) {
+                val documentId = it.getString(it.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DOCUMENT_ID))
+                val displayName = it.getString(it.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME))
+                val lastModifiedMillis = it.getLong(it.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_LAST_MODIFIED))
+
+                // Check if the file is a markdown file
+                if (displayName.endsWith(".md", ignoreCase = true)) {
+                    val fileUri = DocumentsContract.buildDocumentUriUsingTree(directoryUri, documentId)
+                    val fileContent = getFileContent(fileUri, context)
+
+                    // Convert last modified time to LocalDateTime
+                    val lastModified = LocalDateTime.ofEpochSecond(lastModifiedMillis / 1000, 0, ZoneOffset.UTC)
+
+                    // Create the NoteSelectionListItem object
+                    val note = NoteSelectionListItem(
+                        fileName = displayName.substringBeforeLast(".md"),
+                        fileContent = fileContent,
+                        lastModified = lastModified,
+                        fileUri = fileUri
+                    )
+                    markdownFiles.add(note)
+                }
+            }
+        }
+
+        return@withContext markdownFiles
+    }
+
+    suspend fun deleteSelectedFiles(
+        noteSelectionListItems: List<NoteSelectionListItem>,
+        context: Context
+    ): Boolean = withContext(Dispatchers.IO) {
+        val contentResolver = context.contentResolver
+        var success = true
+
+        noteSelectionListItems.filter { it.isSelected }.forEach { file ->
+            try {
+                val deleted = DocumentsContract.deleteDocument(contentResolver, file.fileUri)
+                if (!deleted) {
+                    success = false
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "Failed to delete file: ${file.fileName}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                success = false
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Error deleting file: ${file.fileName}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        // Return true if all selected files were deleted successfully, otherwise false
+        return@withContext success
+    }
+
+
 }

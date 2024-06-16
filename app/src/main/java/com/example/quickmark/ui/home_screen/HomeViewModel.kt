@@ -40,20 +40,17 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun refreshMarkdownFiles() {
+    suspend fun refreshMarkdownFiles() {
         directoryUri.value?.let{uri ->
-            val markdownFilesList = SAFFileHelper.getAllMarkdownFiles(directoryUri = uri, context = getApplication())
-            _markdownFilesList.value = markdownFilesList.map{ NoteSelectionListItem(note = SAFFileHelper.getFile(it, getApplication()), fileUri = it)}
+            _markdownFilesList.value = SAFFileHelper.getMarkdownFilesFromDirectory(directoryUri = uri, context = getApplication()).sortedBy { it.lastModified }.reversed()
         }
     }
 
     fun onDelete() {
         viewModelScope.launch {
-            markdownFilesList.value.filter { it.isSelected }
-                .forEach { item -> SAFFileHelper.deleteFile(fileUri = item.fileUri, context = getApplication()) }
-            _selectionMode.value = false
+            SAFFileHelper.deleteSelectedFiles(noteSelectionListItems = markdownFilesList.value, context =  getApplication())
+            refreshMarkdownFiles()
         }
-        refreshMarkdownFiles()
     }
 
     fun onItemClick(item: NoteSelectionListItem) {
@@ -71,7 +68,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun onClear() {
         if (selectionMode.value) {
-            _markdownFilesList.value = _markdownFilesList.value.map { NoteSelectionListItem(note = it.note, fileUri = it.fileUri) }
+            _markdownFilesList.value = _markdownFilesList.value.map { it.copy(isSelected = false) }
             _selectionMode.value = false
         }
     }

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import com.example.quickmark.ui.theme.Dimen
 import com.example.quickmark.domain.Util
@@ -19,13 +20,13 @@ import com.example.quickmark.ui.theme.LocalCustomColorPalette
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NoteListItem(item: NoteSelectionListItem, context: Context, onClick:()->Unit, onLongClick:()->Unit)
+fun NoteListItem(item: NoteSelectionListItem, onClick:()->Unit, onLongClick:()->Unit)
 {
     Card(
         modifier = Modifier
             .combinedClickable(
-                onClick = {onClick()},
-                onLongClick = {onLongClick()}
+                onClick = { onClick() },
+                onLongClick = { onLongClick() }
             )
             .fillMaxWidth()
             .wrapContentHeight()
@@ -46,7 +47,7 @@ fun NoteListItem(item: NoteSelectionListItem, context: Context, onClick:()->Unit
         {
             Text(
                 modifier = Modifier.padding(bottom = Dimen.Padding.p1),
-                text = item.note.nameWithoutExtension,
+                text = item.fileName,
                 color = LocalCustomColorPalette.current.primary,
                 maxLines = 1,
                 style = CustomTypography.textPrimary,
@@ -55,7 +56,7 @@ fun NoteListItem(item: NoteSelectionListItem, context: Context, onClick:()->Unit
             )
             Text(
                 modifier = Modifier.padding(bottom = Dimen.Padding.p1),
-                text = item.note.readText(),
+                text = item.fileContent,
                 color = LocalCustomColorPalette.current.secondary,
                 maxLines = 1,
                 style = CustomTypography.textSecondary,
@@ -63,7 +64,7 @@ fun NoteListItem(item: NoteSelectionListItem, context: Context, onClick:()->Unit
             )
             Text(
                 modifier = Modifier.padding(bottom = Dimen.Padding.p1),
-                text = Util.formattedDate(Util.fromTimestamp(item.note.lastModified())),
+                text = Util.formattedDate(item.lastModified),
                 color = LocalCustomColorPalette.current.secondary,
                 maxLines = 1,
                 style = CustomTypography.textTertiary,
