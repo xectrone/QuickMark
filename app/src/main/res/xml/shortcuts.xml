@@ -7,8 +7,8 @@
         android:shortcutShortLabel="@string/short_label">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.example.quickmark"
-            android:targetClass="com.example.quickmark.ui.add_note_dialog.AddNoteActivity">
+            android:targetPackage="com.xectrone.quickmark"
+            android:targetClass="com.xectrone.quickmark.ui.add_note_dialog.AddNoteActivity">
             <extra android:name="shortcut_id" android:value="static" />
         </intent>
 

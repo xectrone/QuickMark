@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.example.quickmark'
+    namespace 'com.xectrone.quickmark'
     compileSdk 33
 
     defaultConfig {
