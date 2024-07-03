@@ -46,7 +46,9 @@ class AddNoteViewModel(application: Application): AndroidViewModel(application) 
         directoryUri.value?.let { SAFFileHelper.createFile(fileName = noteTitle.value, content = noteContent.value, directoryUri = it, context = getApplication() ) }
     }
 
-    fun isNoteExists(fileName: String): Boolean{
-        return directoryUri.value?.let { SAFFileHelper.isFileExists(newFileName = fileName,directoryUri = it, context = getApplication()) }?:true
+
+    fun isNoteExists(): Boolean{
+        val isExists = directoryUri.value?.let { it1 -> SAFFileHelper.isFileExists(newFileName = noteTitle.value, directoryUri = it1, context = getApplication()) }
+        return isExists?:true
     }
 }

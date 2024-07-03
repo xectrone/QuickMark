@@ -1,7 +1,6 @@
 package com.example.quickmark.ui.add_note_dialog.add_note_dialog
 
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -43,13 +42,22 @@ fun AddNoteDialog(
 
     fun onDone()
     {
-        if (noteTitle.isNotBlank() && isValidFileName) {
-            viewModel.onSaveClick()
-            finish()
+        val isValidTitle = Util.isValidFileName(noteTitle)
+        val isAlreadyExits = viewModel.isNoteExists()
+        isValidFileName = isValidTitle && !isAlreadyExits
+        if(noteTitle.isNotBlank()){
+            if(!isValidTitle)
+                Toast.makeText(context,Constants.ExceptionToast.NO_VALID_FILE_NAME, Toast.LENGTH_LONG).show()
+            else if(isAlreadyExits)
+                Toast.makeText(context,Constants.ExceptionToast.FILE_ALREADY_EXIST, Toast.LENGTH_LONG).show()
+            else{
+                viewModel.onSaveClick()
+                finish()
+
+            }
         }
-        else{
-            Toast.makeText(context, Constants.ExceptionToast.VALID_TITLE, Toast.LENGTH_LONG).show()
-        }
+        else
+            Toast.makeText(context,Constants.ExceptionToast.VALID_TITLE, Toast.LENGTH_LONG).show()
     }
 
 
@@ -94,10 +102,7 @@ fun AddNoteDialog(
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = noteTitle,
-                    onValueChange = {
-                        viewModel.onNoteTitleChange(it)
-                        isValidFileName = (Util.isValidFileName(it) && !viewModel.isNoteExists(it))
-                                    },
+                    onValueChange = { viewModel.onNoteTitleChange(it) },
                     placeholder = {
                         Text(
                             text = "Title",
@@ -132,7 +137,6 @@ fun AddNoteDialog(
                 IconButton(
                     modifier = Modifier
                         .align(Alignment.End),
-                    enabled = isValidFileName,
                     onClick = {  onDone() }
                 ) {
                     Icon(painter = painterResource(id = R.drawable.baseline_send_24), contentDescription = Constants.Labels.AddEdit.SAVE, tint = LocalCustomColorPalette.current.accent)

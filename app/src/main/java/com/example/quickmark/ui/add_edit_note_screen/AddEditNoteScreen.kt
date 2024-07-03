@@ -2,7 +2,6 @@ package com.example.quickmark.ui.add_edit_note_screen
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -107,36 +106,43 @@ fun AddEditNoteScreen(
         //region - Floating Action Button -
         floatingActionButton =
         {
-            if (isValidFileName && isFileModified)
-            {
-                FloatingActionButton(
-                        modifier = Modifier
-                            .imePadding()
-                            .padding(end = Dimen.Padding.p4, bottom = Dimen.Padding.p5),
-                        backgroundColor = LocalCustomColorPalette.current.accent,
-                        onClick =
-                        {
-                            if(noteTitle.isNotBlank()){
-                                if (isNewNote) {
-                                    viewModel.onCreateNote()
-                                    navController.navigateUp()
-                                }
-                                else
-                                    viewModel.onEditNote()
-                            }
-                            else{
-                                Toast.makeText(context,Constants.ExceptionToast.VALID_TITLE, Toast.LENGTH_LONG).show()
-                            }
 
+            FloatingActionButton(
+                modifier = Modifier
+                    .imePadding()
+                    .padding(end = Dimen.Padding.p4, bottom = Dimen.Padding.p5),
+                backgroundColor = LocalCustomColorPalette.current.accent,
+                onClick =
+                {
+                    val isValidTitle = Util.isValidFileName(noteTitle)
+                    val isAlreadyExits = viewModel.isNoteExists()
+                    isValidFileName = isValidTitle && !isAlreadyExits
+                    if(noteTitle.isNotBlank()){
+                        if(!isValidTitle)
+                            Toast.makeText(context,Constants.ExceptionToast.NO_VALID_FILE_NAME, Toast.LENGTH_LONG).show()
+                        else if(isAlreadyExits)
+                            Toast.makeText(context,Constants.ExceptionToast.FILE_ALREADY_EXIST, Toast.LENGTH_LONG).show()
+                        else{
+                            if (isNewNote) {
+                                viewModel.onCreateNote()
+                                navController.navigateUp()
+                            }
+                            else
+                                viewModel.onEditNote()
                         }
-                    )
-                    {
-                        Icon(painter = painterResource(id = R.drawable.round_save_24),
-                            contentDescription = Constants.Labels.AddEdit.SAVE,
-                            tint = LocalCustomColorPalette.current.background
-
-                        )
                     }
+                    else
+                        Toast.makeText(context,Constants.ExceptionToast.VALID_TITLE, Toast.LENGTH_LONG).show()
+
+                }
+            )
+            {
+                Icon(painter = painterResource(id = R.drawable.round_save_24),
+                    contentDescription = Constants.Labels.AddEdit.SAVE,
+                    tint = LocalCustomColorPalette.current.background
+
+                )
+
             }
 
 
@@ -148,17 +154,14 @@ fun AddEditNoteScreen(
     ) {
         Column(
             modifier = Modifier
-                .padding(horizontal = Dimen.Padding.p4)
+                .padding(horizontal = Dimen.Padding.p3)
                 .verticalScroll(state = rememberScrollState(), reverseScrolling = true)
                 .imePadding()
         ) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = noteTitle,
-                onValueChange = {
-                    viewModel.onNoteTitleChange(it)
-                    isValidFileName = Util.isValidFileName(it) && !viewModel.isNoteExists()
-                                },
+                onValueChange = { viewModel.onNoteTitleChange(it) },
                 textStyle = CustomTypography.title,
                 isError = !isValidFileName,
                 placeholder ={

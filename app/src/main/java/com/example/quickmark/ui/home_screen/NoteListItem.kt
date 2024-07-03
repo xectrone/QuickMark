@@ -1,5 +1,4 @@
 package com.example.quickmark.ui.home_screen
-import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
@@ -11,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.quickmark.ui.theme.Dimen
 import com.example.quickmark.domain.Util
 import com.example.quickmark.ui.theme.CustomTypography
@@ -51,7 +50,7 @@ fun NoteListItem(item: NoteSelectionListItem, onClick:()->Unit, onLongClick:()->
                 color = LocalCustomColorPalette.current.primary,
                 maxLines = 1,
                 style = CustomTypography.textPrimary,
-                softWrap = true
+                overflow = TextOverflow.Ellipsis
 
             )
             Text(
@@ -60,7 +59,7 @@ fun NoteListItem(item: NoteSelectionListItem, onClick:()->Unit, onLongClick:()->
                 color = LocalCustomColorPalette.current.secondary,
                 maxLines = 1,
                 style = CustomTypography.textSecondary,
-                softWrap = true
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 modifier = Modifier.padding(bottom = Dimen.Padding.p1),
