@@ -12,8 +12,8 @@ android {
         applicationId "com.xectrone.quickmark"
         minSdk 26
         targetSdk 33
-        versionCode 6
-        versionName "1.1.2"
+        versionCode 8
+        versionName "1.1.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -76,6 +76,10 @@ dependencies {
     // Preferences Data Store
     implementation "androidx.datastore:datastore-preferences:1.0.0"
 
+    // File Handling
     implementation 'androidx.documentfile:documentfile:1.0.1'
+
+    // Navigation Animation
+    implementation "com.google.accompanist:accompanist-navigation-animation:0.30.0"
 
 }
