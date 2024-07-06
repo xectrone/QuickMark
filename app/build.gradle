@@ -6,13 +6,13 @@ plugins {
 
 android {
     namespace 'com.xectrone.quickmark'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.xectrone.quickmark"
         minSdk 26
-        targetSdk 33
-        versionCode 8
+        targetSdk 34
+        versionCode 9
         versionName "1.1.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
