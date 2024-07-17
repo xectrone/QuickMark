@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     >
+    <!-- Permissions -->
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+
+    <!-- Application -->
     <application
         android:name=".data.QuickMark"
         android:allowBackup="true"
@@ -15,6 +18,8 @@
         android:theme="@style/Theme.QuickMark"
         tools:targetApi="31"
         >
+
+        <!-- Main activity-->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -27,6 +32,8 @@
             <meta-data android:resource="@xml/shortcuts"
                 android:name="android.app.shortcuts"/>
         </activity>
+
+        <!-- Activity for adding notes. -->
         <activity
             android:taskAffinity=".ui.add_note_dialog.AddNoteActivity"
             android:name=".ui.add_note_dialog.AddNoteActivity"
@@ -36,7 +43,7 @@
             android:theme="@style/Theme.TransparentActivity">
         </activity>
 
-
+        <!-- Broadcast receiver for handling widget click events. -->
         <receiver android:name=".ui.add_note_dialog.add_note_dialog_widget.AddNoteWidgetClickListener"
             android:exported="true">
             <intent-filter>
@@ -44,6 +51,7 @@
             </intent-filter>
         </receiver>
 
+        <!-- App widget provider for the note widget. -->
         <receiver android:name=".ui.add_note_dialog.add_note_dialog_widget.QuickMarkWidgetProvider"
             android:exported="true">
             <intent-filter>
@@ -54,6 +62,7 @@
                 android:resource="@xml/add_note_widget_provider" />
         </receiver>
 
+        <!-- Service for adding note dialog tile. -->
         <service
             android:name=".ui.add_note_dialog.add_note_dialog_tile.AddNoteDialogService"
             android:label="NewMarkdownFileDialogTile"

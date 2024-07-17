@@ -19,6 +19,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 object SAFFileHelper {
+    // Get all markdown files in the given directory
     fun getAllMarkdownFiles(directoryUri: Uri, context: Context): List<Uri> {
         val markdownFiles = mutableListOf<Uri>()
 
