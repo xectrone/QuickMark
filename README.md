@@ -11,9 +11,9 @@
 Lightweight app designed for fast and easy markdown note-taking
 
 </div>
+<br/>
 
-
-# Motivation 
+## Motivation 
 
 Markdown note-taking apps are awesome, offering loads of benefits, flexibility, and features. However, most of them can be slow and complicated, making it a hassle to jot down a quick two-line note. Enter QuickMark. QuickMark is a lightweight, minimalist Android app designed to be the go-to quick note-taker for markdown users.
 
