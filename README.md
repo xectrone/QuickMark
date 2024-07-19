@@ -63,7 +63,7 @@ If you enjoy **QuickMark** and want to see it continue to grow with new features
 
 
 
-**Thank you ❤️**
+**Thank you ♡**
 
 </div>
 
