@@ -57,11 +57,11 @@ QuickMark is licensed under the GLP-3.0 License. See the [LICENSE](./LICENSE) fi
 I'm a solo developer behind **QuickMark**, and it's been quite a journey evolving this app! I've tackled various projects along the way, but I’m always excited to contribute to the markdown note-taking community.
 If you enjoy **QuickMark** and want to see it continue to grow with new features, improvements, and bug fixes, your support would mean the world to me.
 
-<br/>
+
 
  <a style="display: inline-block; margin-right: 0.25rem;"><a href="https://www.ko-fi.com/xectrone"><img src="https://storage.ko-fi.com/cdn/kofi2.png?v=3" width="150"/></a></a>
 
-<br/>
+
 
 **Thank you ❤️**
 
