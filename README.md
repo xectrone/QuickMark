@@ -11,7 +11,6 @@
 Lightweight app designed for fast and easy markdown note-taking
 
 </div>
-<br/>
 
 ## Motivation 
 
