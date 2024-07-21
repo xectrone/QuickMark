@@ -2,6 +2,12 @@
     <img src="https://github.com/xectrone/xectrone/blob/main/assets/QuickMark/Icon/Icon%20%E2%80%93%209.png" width="192" height="192" alt="Icon">
     <br />
     <b>QuickMark - Markdown Notetaker</b>
+
+![Kotlin Version](https://img.shields.io/badge/Kotlin-1.8.10-blue)
+![Compose Version](https://img.shields.io/badge/Compose-1.4.0-blue)
+![Version](https://img.shields.io/badge/Version-1.1.4-brightgreen.svg)
+[![Android API](https://img.shields.io/badge/Android%20API-26%2B-brightgreen)](https://developer.android.com/studio/releases/platforms)
+
 </h1>
 
 <div align="center">
