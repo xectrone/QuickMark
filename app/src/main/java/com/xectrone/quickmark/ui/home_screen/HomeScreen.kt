@@ -59,15 +59,15 @@ fun HomeScreen(
                     Text(text = stringResource(id = R.string.app_name), style =  CustomTypography.h2)
                 },
 
-                navigationIcon = {
-                    IconButton(
-                        onClick =
-                        {
-//                            scope.launch { scaffoldState.drawerState.open() }
-                        }
-                    )
-                    { Icon(imageVector = Icons.Rounded.Menu, contentDescription = Constants.Labels.HomeScreen.MENU) }
-                },
+//                navigationIcon = {
+//                    IconButton(
+//                        onClick =
+//                        {
+////                            scope.launch { scaffoldState.drawerState.open() }
+//                        }
+//                    )
+//                    { Icon(imageVector = Icons.Rounded.Menu, contentDescription = Constants.Labels.HomeScreen.MENU) }
+//                },
                 actions = {
                     if(selectionMode) {
                         IconButton(
