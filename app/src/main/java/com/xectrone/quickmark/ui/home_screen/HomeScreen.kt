@@ -1,9 +1,13 @@
 package com.xectrone.quickmark.ui.home_screen
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -15,12 +19,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -32,6 +36,7 @@ import com.xectrone.quickmark.ui.theme.CustomTypography
 import com.xectrone.quickmark.ui.theme.LocalCustomColorPalette
 import com.xectrone.quickmark.ui.utility.MessageScreen
 
+@OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
@@ -41,9 +46,11 @@ fun HomeScreen(
     val markdownFilesList by viewModel.markdownFilesList.collectAsStateWithLifecycle(emptyList())
     val selectionMode by viewModel.selectionMode
     val directoryUri by viewModel.directoryUri
+    val isExpanded by viewModel.isExpanded
 
     LaunchedEffect(key1 = navController.currentBackStackEntry) {
         viewModel.observeDirectoryUri()
+        viewModel.observeSortOption()
     }
 
     Scaffold(
@@ -68,7 +75,7 @@ fun HomeScreen(
 //                    )
 //                    { Icon(imageVector = Icons.Rounded.Menu, contentDescription = Constants.Labels.HomeScreen.MENU) }
 //                },
-                actions = {
+                actions = @androidx.compose.runtime.Composable {
                     if(selectionMode) {
                         IconButton(
                             onClick = { viewModel.onDelete() }
@@ -79,6 +86,25 @@ fun HomeScreen(
                             onClick = { viewModel.onClear() }
                         )
                         { Icon(imageVector = Icons.Rounded.Clear, contentDescription = Constants.Labels.HomeScreen.CLEAR) }
+                    }
+                    IconButton(onClick = {viewModel.showMenu()})
+                    {
+                        Icon(painter = painterResource(id = R.drawable.round_sort_24), contentDescription = Constants.Labels.HomeScreen.CLEAR)
+                        DropdownMenu(expanded = isExpanded, onDismissRequest = { viewModel.hideMenu() })
+                        {
+                            DropdownMenuItem(onClick = { viewModel.onSort(SortOptions.nameASC) })
+                            { Text(text = Constants.Labels.SortOptions.nameASC) }
+
+                            DropdownMenuItem(onClick = { viewModel.onSort(SortOptions.nameDESC) })
+                            { Text(text = Constants.Labels.SortOptions.nameDESC) }
+
+                            DropdownMenuItem(onClick = { viewModel.onSort(SortOptions.lastModifiedASC) })
+                            { Text(text = Constants.Labels.SortOptions.lastModifiedASC) }
+
+                            DropdownMenuItem(onClick = { viewModel.onSort(SortOptions.lastModifiedDESC) })
+                            { Text(text = Constants.Labels.SortOptions.lastModifiedDESC) }
+                        }
+
                     }
 
                     IconButton(
@@ -122,9 +148,12 @@ fun HomeScreen(
                     .padding(horizontal = Dimen.Padding.p4)
             ){
                 //region - List View -
-                items(markdownFilesList)
+                items(items = markdownFilesList, key ={it.fileName})
                 {
                     NoteListItem(
+                        modifier = Modifier.animateItemPlacement(
+                            animationSpec = tween(durationMillis = 600)
+                        ),
                         item = NoteSelectionListItem(fileName = it.fileName, fileContent = it.fileContent, fileUri = it.fileUri, lastModified = it.lastModified, isSelected = it.isSelected),
                         onClick =
                         {

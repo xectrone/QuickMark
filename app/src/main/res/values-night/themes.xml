@@ -3,6 +3,7 @@
 
     <style name="Theme.QuickMark" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
     <style name="Theme.TransparentActivity" parent="Theme.AppCompat.DayNight.Dialog">

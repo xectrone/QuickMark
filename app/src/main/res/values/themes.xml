@@ -4,6 +4,7 @@
     <style name="Theme.QuickMark" parent="android:Theme.Material.Light.NoActionBar" >
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowLightStatusBar">true</item>
+
     </style>
 
     <style name="Theme.TransparentActivity" parent="Theme.AppCompat.DayNight.Dialog">

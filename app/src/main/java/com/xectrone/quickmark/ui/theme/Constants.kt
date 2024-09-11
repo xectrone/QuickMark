@@ -32,5 +32,13 @@ object Constants {
             const val SAVE = "Save"
         }
 
+        object SortOptions {
+            const val nameASC = "By Name ASC"
+            const val nameDESC = "By Name DESC"
+            const val lastModifiedASC = "By Date ASC"
+            const val lastModifiedDESC = "By Date DESC"
+        }
     }
+
+
 }

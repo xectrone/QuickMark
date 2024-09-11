@@ -19,10 +19,10 @@ import com.xectrone.quickmark.ui.theme.LocalCustomColorPalette
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NoteListItem(item: NoteSelectionListItem, onClick:()->Unit, onLongClick:()->Unit)
+fun NoteListItem(modifier: Modifier = Modifier, item: NoteSelectionListItem, onClick:()->Unit, onLongClick:()->Unit)
 {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .combinedClickable(
                 onClick = { onClick() },
                 onLongClick = { onLongClick() }

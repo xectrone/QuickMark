@@ -7,6 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.xectrone.quickmark.domain.file_handling.DataStore.getSavedDirectoryUri
+import com.xectrone.quickmark.domain.file_handling.DataStore.getSavedSort
+import com.xectrone.quickmark.domain.file_handling.DataStore.saveSelectedSort
 import com.xectrone.quickmark.domain.file_handling.SAFFileHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +19,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _directoryUri = mutableStateOf<Uri?>(null)
     val directoryUri: State<Uri?> = _directoryUri
 
+    private val _sortOption = mutableStateOf<Int?>(0)
+    val sortOption: State<Int?> = _sortOption
+
+    private val _isExpanded = mutableStateOf<Boolean>(false)
+    val isExpanded: State<Boolean> = _isExpanded
+
     private val _markdownFilesList = MutableStateFlow<List<NoteSelectionListItem>>(emptyList())
     val markdownFilesList: StateFlow<List<NoteSelectionListItem>> = _markdownFilesList
 
@@ -25,6 +33,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         observeDirectoryUri()
+        observeSortOption()
     }
 
     fun observeDirectoryUri() {
@@ -38,9 +47,27 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun observeSortOption() {
+        viewModelScope.launch {
+            getSavedSort(getApplication())?.let{
+                if(sortOption.value != it) {
+                    _sortOption.value = it
+                    refreshMarkdownFiles()
+                }
+            }
+        }
+    }
+
     suspend fun refreshMarkdownFiles() {
         directoryUri.value?.let{uri ->
-            _markdownFilesList.value = SAFFileHelper.getMarkdownFilesFromDirectory(directoryUri = uri, context = getApplication()).sortedBy { it.lastModified }.reversed()
+            _markdownFilesList.value = when(sortOption.value){
+                SortOptions.nameASC -> SAFFileHelper.getMarkdownFilesFromDirectory(directoryUri = uri, context = getApplication()).sortedBy { it.fileName }
+                SortOptions.nameDESC -> SAFFileHelper.getMarkdownFilesFromDirectory(directoryUri = uri, context = getApplication()).sortedBy { it.fileName }.reversed()
+                SortOptions.lastModifiedASC -> SAFFileHelper.getMarkdownFilesFromDirectory(directoryUri = uri, context = getApplication()).sortedBy { it.lastModified }
+                SortOptions.lastModifiedDESC -> SAFFileHelper.getMarkdownFilesFromDirectory(directoryUri = uri, context = getApplication()).sortedBy { it.lastModified }.reversed()
+                else -> SAFFileHelper.getMarkdownFilesFromDirectory(directoryUri = uri, context = getApplication()).sortedBy { it.lastModified }.reversed()
+            }
+
         }
     }
 
@@ -70,5 +97,21 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             _markdownFilesList.value = _markdownFilesList.value.map { it.copy(isSelected = false) }
             _selectionMode.value = false
         }
+    }
+
+    fun onSort(sortOption:Int){
+        viewModelScope.launch {
+            saveSelectedSort(context = getApplication(), sortOption = sortOption)
+        }
+        observeSortOption()
+        hideMenu()
+    }
+
+    fun showMenu(){
+        _isExpanded.value = true
+    }
+
+    fun hideMenu(){
+        _isExpanded.value = false
     }
 }
