@@ -1,6 +1,8 @@
 package com.xectrone.quickmark.ui.home_screen
 
 import android.annotation.SuppressLint
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
@@ -23,7 +25,11 @@ import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,6 +41,7 @@ import com.xectrone.quickmark.ui.theme.Constants
 import com.xectrone.quickmark.ui.theme.CustomTypography
 import com.xectrone.quickmark.ui.theme.LocalCustomColorPalette
 import com.xectrone.quickmark.ui.utility.MessageScreen
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -49,9 +56,17 @@ fun HomeScreen(
 
     val isExpanded by viewModel.isExpanded
 
+    val context = LocalContext.current
+    var backPressHandled by remember { mutableStateOf(true) }
+
     LaunchedEffect(key1 = navController.currentBackStackEntry) {
         viewModel.observeDirectoryUri()
         viewModel.observeSortOption()
+    }
+
+    LaunchedEffect(key1 = backPressHandled) {
+        delay(2000)
+        backPressHandled = true
     }
 
     Scaffold(
@@ -174,5 +189,17 @@ fun HomeScreen(
         else
             MessageScreen(message = Constants.SELECT_DIRECTORY_PATH_MSG)
     }
+
+    //region - Back Press Handler -
+    BackHandler(enabled = backPressHandled) {
+        if(selectionMode)
+            viewModel.onClear()
+        else {
+            Toast.makeText(context, Constants.Toast.DOUBLE_BACK, Toast.LENGTH_SHORT).show()
+            backPressHandled = false
+        }
+    }
+    //endregion
+
 }
 

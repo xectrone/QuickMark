@@ -67,7 +67,7 @@ object SAFFileHelper {
         )
 
         if (newFileUri == null) {
-            Toast.makeText(context, "Failed to create new file.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Failed to create new file", Toast.LENGTH_SHORT).show()
             return
         }
 

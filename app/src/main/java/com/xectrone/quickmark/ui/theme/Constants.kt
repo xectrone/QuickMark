@@ -12,6 +12,10 @@ object Constants {
 
     }
 
+    object Toast{
+        const val DOUBLE_BACK = "Press back again to exit"
+    }
+
     object Labels {
         const val BACK = "Navigate to previous screen"
         object HomeScreen{

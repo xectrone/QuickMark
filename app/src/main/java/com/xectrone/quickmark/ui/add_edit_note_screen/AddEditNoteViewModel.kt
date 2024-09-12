@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.xectrone.quickmark.domain.Util
-import com.xectrone.quickmark.domain.file_handling.DataStore.getSavedDirectoryUri
+import com.xectrone.quickmark.data.DataStore.getSavedDirectoryUri
 import com.xectrone.quickmark.domain.file_handling.SAFFileHelper
 import kotlinx.coroutines.launch
 

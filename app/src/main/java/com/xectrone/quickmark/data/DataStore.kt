@@ -1,4 +1,4 @@
-package com.xectrone.quickmark.domain.file_handling
+package com.xectrone.quickmark.data
 
 import android.content.Context
 import android.net.Uri

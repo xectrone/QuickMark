@@ -28,7 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
-import com.xectrone.quickmark.domain.file_handling.DataStore.saveSelectedDirectoryUri
+import com.xectrone.quickmark.data.DataStore.saveSelectedDirectoryUri
 import com.xectrone.quickmark.ui.add_note_dialog.add_note_dialog_shortcut.addHomeScreenShortcut
 import com.xectrone.quickmark.ui.theme.Constants
 import com.xectrone.quickmark.ui.theme.CustomShape

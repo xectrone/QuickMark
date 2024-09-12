@@ -6,9 +6,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.xectrone.quickmark.domain.file_handling.DataStore.getSavedDirectoryUri
-import com.xectrone.quickmark.domain.file_handling.DataStore.getSavedSort
-import com.xectrone.quickmark.domain.file_handling.DataStore.saveSelectedSort
+import com.xectrone.quickmark.data.DataStore.getSavedDirectoryUri
+import com.xectrone.quickmark.data.DataStore.getSavedSort
+import com.xectrone.quickmark.data.DataStore.saveSelectedSort
 import com.xectrone.quickmark.domain.file_handling.SAFFileHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,8 +32,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val selectionMode: State<Boolean> = _selectionMode
 
     init {
-        observeDirectoryUri()
         observeSortOption()
+        observeDirectoryUri()
     }
 
     fun observeDirectoryUri() {
