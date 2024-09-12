@@ -109,6 +109,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun showMenu(){
         _isExpanded.value = true
+        onClear()
     }
 
     fun hideMenu(){

@@ -46,6 +46,7 @@ fun HomeScreen(
     val markdownFilesList by viewModel.markdownFilesList.collectAsStateWithLifecycle(emptyList())
     val selectionMode by viewModel.selectionMode
     val directoryUri by viewModel.directoryUri
+
     val isExpanded by viewModel.isExpanded
 
     LaunchedEffect(key1 = navController.currentBackStackEntry) {
@@ -110,6 +111,7 @@ fun HomeScreen(
                     IconButton(
                         onClick =
                         {
+                            viewModel.onClear()
                             navController.navigate(Screen.Setting.route)
                         }
                     )
@@ -126,6 +128,7 @@ fun HomeScreen(
                 FloatingActionButton(
                     modifier = Modifier.padding(end = Dimen.Padding.p4, bottom = Dimen.Padding.p5),
                     onClick = {
+                        viewModel.onClear()
                         navController.navigate(Screen.AddEditNote.route)
                     },
                     backgroundColor = MaterialTheme.colors.secondary
