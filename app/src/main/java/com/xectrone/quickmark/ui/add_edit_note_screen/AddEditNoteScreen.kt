@@ -127,8 +127,10 @@ fun AddEditNoteScreen(
                                 viewModel.onCreateNote()
                                 navController.navigateUp()
                             }
-                            else
+                            else {
                                 viewModel.onEditNote()
+                                navController.navigateUp()
+                            }
                         }
                     }
                     else
