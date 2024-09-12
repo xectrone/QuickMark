@@ -64,7 +64,7 @@ fun HomeScreen(
                 contentColor = LocalCustomColorPalette.current.primary,
                 title =
                 {
-                    Text(text = stringResource(id = R.string.app_name), style =  CustomTypography.h2)
+                    Text(text = stringResource(id = R.string.app_name), style =  CustomTypography.h2, color = LocalCustomColorPalette.current.primary)
                 },
 
 //                navigationIcon = {
@@ -81,16 +81,16 @@ fun HomeScreen(
                         IconButton(
                             onClick = { viewModel.onDelete() }
                         )
-                        { Icon(imageVector = Icons.Rounded.Delete, contentDescription = Constants.Labels.HomeScreen.DELETE) }
+                        { Icon(imageVector = Icons.Rounded.Delete, contentDescription = Constants.Labels.HomeScreen.DELETE, tint = LocalCustomColorPalette.current.primary) }
 
                         IconButton(
                             onClick = { viewModel.onClear() }
                         )
-                        { Icon(imageVector = Icons.Rounded.Clear, contentDescription = Constants.Labels.HomeScreen.CLEAR) }
+                        { Icon(imageVector = Icons.Rounded.Clear, contentDescription = Constants.Labels.HomeScreen.CLEAR, tint = LocalCustomColorPalette.current.primary) }
                     }
                     IconButton(onClick = {viewModel.showMenu()})
                     {
-                        Icon(painter = painterResource(id = R.drawable.round_sort_24), contentDescription = Constants.Labels.HomeScreen.CLEAR)
+                        Icon(painter = painterResource(id = R.drawable.round_sort_24), contentDescription = Constants.Labels.HomeScreen.SORT, tint = LocalCustomColorPalette.current.primary)
                         DropdownMenu(expanded = isExpanded, onDismissRequest = { viewModel.hideMenu() })
                         {
                             DropdownMenuItem(onClick = { viewModel.onSort(SortOptions.nameASC) })
@@ -115,7 +115,7 @@ fun HomeScreen(
                             navController.navigate(Screen.Setting.route)
                         }
                     )
-                    { Icon(imageVector = Icons.Rounded.Settings, contentDescription = Constants.Labels.HomeScreen.SETTINGS) }
+                    { Icon(imageVector = Icons.Rounded.Settings, contentDescription = Constants.Labels.HomeScreen.SETTINGS, tint = LocalCustomColorPalette.current.primary) }
                 },
 
                 elevation = Dimen.TopBar.elevation

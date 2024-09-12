@@ -20,6 +20,7 @@ object Constants {
             const val CLEAR = "Clear Selection"
             const val SETTINGS = "Open Settings"
             const val ADD = "Add New Note"
+            const val SORT = "Show Sorting Options"
         }
 
         object SettingScreen{
