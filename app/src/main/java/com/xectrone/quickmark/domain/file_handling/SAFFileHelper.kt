@@ -1,13 +1,13 @@
 package com.xectrone.quickmark.domain.file_handling
 
 import android.content.ContentResolver
-import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
 import com.xectrone.quickmark.ui.home_screen.NoteSelectionListItem
+import com.xectrone.quickmark.ui.theme.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
@@ -83,37 +83,26 @@ object SAFFileHelper {
     }
 
     fun editFile(newFileName: String, newFileContent: String, fileUri: Uri, context: Context): Uri? {
+        val contentResolver = context.contentResolver
+
         // Get current file name without the extension
         val currentFileName = getFileName(fileUri, context)
 
         // Determine if renaming is needed
         val needsRename = newFileName != currentFileName
 
-        // Get the content resolver
-        val contentResolver = context.contentResolver
+        var updatedUri = fileUri
 
         // Rename the file if needed
-        var updatedUri = fileUri
         if (needsRename) {
-            // Check if a file with the new name already exists in the same directory
-            val parentUri = DocumentsContract.buildDocumentUriUsingTree(
-                fileUri,
-                DocumentsContract.getTreeDocumentId(fileUri).substringBeforeLast(":")
-            )
-
-            // Update the file's display name
             val newFileNameWithExtension = "${newFileName.trim()}.md"
-            val contentValues = ContentValues().apply {
-                put(DocumentsContract.Document.COLUMN_DISPLAY_NAME, newFileNameWithExtension)
-            }
-
             updatedUri = DocumentsContract.renameDocument(contentResolver, fileUri, newFileNameWithExtension)
                 ?: return null // Return null if rename fails
         }
 
-        // Update the file's content
+        // Ensure the file content is updated, even if empty
         try {
-            contentResolver.openOutputStream(updatedUri, "w")?.use { outputStream ->
+            contentResolver.openOutputStream(updatedUri, "wt")?.use { outputStream ->
                 outputStream.write(newFileContent.toByteArray())
             }
         } catch (e: Exception) {
@@ -121,9 +110,9 @@ object SAFFileHelper {
             return null
         }
 
-        // Return the updated URI
         return updatedUri
     }
+
 
     fun deleteFile(fileUri: Uri, context: Context): Boolean {
         return try {
@@ -286,6 +275,16 @@ object SAFFileHelper {
 
         // Return true if all selected files were deleted successfully, otherwise false
         return@withContext success
+    }
+
+    fun is_path_set(directoryUri: Uri?, context: Context):Boolean{
+        if(directoryUri != null)
+            return true
+        else
+        {
+            Toast.makeText(context, Constants.SELECT_DIRECTORY_PATH_MSG, Toast.LENGTH_SHORT).show()
+            return false
+        }
     }
 
 }

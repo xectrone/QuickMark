@@ -2,6 +2,7 @@ package com.xectrone.quickmark.ui.home_screen
 
 import android.app.Application
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
@@ -115,4 +116,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun hideMenu(){
         _isExpanded.value = false
     }
+
+    fun is_path_set() = SAFFileHelper.is_path_set(directoryUri.value, getApplication())
+
 }

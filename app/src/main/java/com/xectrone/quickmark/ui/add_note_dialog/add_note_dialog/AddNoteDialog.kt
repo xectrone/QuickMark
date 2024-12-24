@@ -36,6 +36,7 @@ fun AddNoteDialog(
     val noteContent by viewModel.noteContent
     val noteTitle by viewModel.noteTitle
     val context = LocalContext.current
+    val directoryUri by viewModel.directoryUri
 
     var isValidFileName by remember { mutableStateOf(true) }
     val focusRequester = remember { FocusRequester() }
@@ -46,7 +47,9 @@ fun AddNoteDialog(
         val isAlreadyExits = viewModel.isNoteExists()
         isValidFileName = isValidTitle && !isAlreadyExits
         if(noteTitle.isNotBlank()){
-            if(!isValidTitle)
+            if (directoryUri == null)
+                Toast.makeText(context, Constants.SELECT_DIRECTORY_PATH_MSG, Toast.LENGTH_LONG).show()
+            else if(!isValidTitle)
                 Toast.makeText(context,Constants.ExceptionToast.NO_VALID_FILE_NAME, Toast.LENGTH_LONG).show()
             else if(isAlreadyExits)
                 Toast.makeText(context,Constants.ExceptionToast.FILE_ALREADY_EXIST, Toast.LENGTH_LONG).show()
@@ -72,13 +75,12 @@ fun AddNoteDialog(
     )
 
     Dialog(
-            onDismissRequest = { finish()  } ,
-            properties = DialogProperties(
-                dismissOnClickOutside = true,
-                dismissOnBackPress = true,
-                usePlatformDefaultWidth = false
-            ),
-
+        onDismissRequest = { finish() },
+        properties = DialogProperties(
+            dismissOnClickOutside = true,
+            dismissOnBackPress = true,
+            usePlatformDefaultWidth = false
+        ),
     ) {
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
@@ -91,68 +93,78 @@ fun AddNoteDialog(
             shape = RoundedCornerShape(Dimen.Padding.p3),
             elevation = Dimen.Padding.p2,
             color = LocalCustomColorPalette.current.surface
-
         ) {
-
-            Column(
-                modifier = Modifier.padding(Dimen.Padding.p3),
-                horizontalAlignment = Alignment.CenterHorizontally,
-
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimen.Padding.p3)
             ) {
-                TextField(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    value = noteTitle,
-                    onValueChange = { viewModel.onNoteTitleChange(it) },
-                    placeholder = {
-                        Text(
-                            text = "Title",
-                            style = MaterialTheme.typography.subtitle2
-                        )
-                                  },
-                    colors = textFieldColor,
-                    isError = !isValidFileName,
-                    textStyle = MaterialTheme.typography.subtitle2,
-                    trailingIcon = {
-                        IconButton(onClick = { viewModel.onNoteTitleChange("") }) {
-                            Icon(modifier= Modifier.size(18.dp) ,imageVector = Icons.Rounded.Clear, contentDescription = Constants.Labels.AddEdit.CLEAR, tint = LocalCustomColorPalette.current.primary.copy(0.4f))
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { onDone() }),
-                )
-
-                TextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
-                    value = noteContent,
-                    onValueChange = { viewModel.onNoteContentChange(it) },
-                    placeholder = { Text("Write here...") },
-                    colors = textFieldColor,
-                    textStyle = MaterialTheme.typography.subtitle1.copy(fontSize = 16.sp),
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                IconButton(
-                    modifier = Modifier
-                        .align(Alignment.End),
-                    onClick = {  onDone() }
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween // Ensures spacing
                 ) {
-                    Icon(painter = painterResource(id = R.drawable.baseline_send_24), contentDescription = Constants.Labels.AddEdit.SAVE, tint = LocalCustomColorPalette.current.accent)
-                }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f, fill = false), // Makes this section scrollable
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        TextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = noteTitle,
+                            onValueChange = { viewModel.onNoteTitleChange(it) },
+                            placeholder = {
+                                Text(
+                                    text = "Title",
+                                    style = MaterialTheme.typography.subtitle2
+                                )
+                            },
+                            colors = textFieldColor,
+                            isError = !isValidFileName,
+                            textStyle = MaterialTheme.typography.subtitle2,
+                            trailingIcon = {
+                                IconButton(onClick = { viewModel.onNoteTitleChange("") }) {
+                                    Icon(
+                                        modifier = Modifier.size(18.dp),
+                                        imageVector = Icons.Rounded.Clear,
+                                        contentDescription = Constants.Labels.AddEdit.CLEAR,
+                                        tint = LocalCustomColorPalette.current.primary.copy(0.4f)
+                                    )
+                                }
+                            },
+                            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(onDone = { onDone() }),
+                            singleLine = true
+                        )
 
-//                Button(
-//                    shape = RoundedCornerShape(Dimen.Padding.p2),
-//                    colors = ButtonDefaults.buttonColors(
-//                        backgroundColor = LocalCustomColorPalette.current.primary,
-//                        contentColor = LocalCustomColorPalette.current.backgroundSecondary
-//                    ),
-//                    enabled = isValidFileName,
-//                    onClick = { onDone() }
-//                ) {
-//                    Text(text = "Done", color = LocalCustomColorPalette.current.primary)
-//                }
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        TextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .focusRequester(focusRequester),
+                            value = noteContent,
+                            onValueChange = { viewModel.onNoteContentChange(it) },
+                            placeholder = { Text("Write here...") },
+                            colors = textFieldColor,
+                            textStyle = MaterialTheme.typography.subtitle1.copy(fontSize = 16.sp),
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    IconButton(
+                        modifier = Modifier.align(Alignment.End),
+                        onClick = { onDone() }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_send_24),
+                            contentDescription = Constants.Labels.AddEdit.SAVE,
+                            tint = LocalCustomColorPalette.current.accent
+                        )
+                    }
+                }
             }
         }
     }

@@ -60,6 +60,8 @@ fun AddEditNoteScreen(
     val context = LocalContext.current
 
     val focusRequester = remember { FocusRequester() }
+    val scrollState = rememberScrollState() // ScrollState to control scrolling
+
     LaunchedEffect(fileUri){
         if (fileUri != null) {
             viewModel.setFileUri(fileUri = fileUri.toString())
@@ -73,6 +75,7 @@ fun AddEditNoteScreen(
             delay(200)
             focusRequester.requestFocus()
         }
+        scrollState.scrollTo(scrollState.maxValue)
     }
 
 
@@ -156,9 +159,9 @@ fun AddEditNoteScreen(
     ) {
         Column(
             modifier = Modifier
-                .padding(horizontal = Dimen.Padding.p3)
-                .verticalScroll(state = rememberScrollState(), reverseScrolling = true)
+                .verticalScroll(state = scrollState, reverseScrolling = true)
                 .imePadding()
+                .padding(horizontal = Dimen.Padding.p3)
         ) {
             TextField(
                 modifier = Modifier.fillMaxWidth(),

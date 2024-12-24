@@ -67,7 +67,6 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
     fun onEditNote(){
         fileUri.value?.let { _fileUri.value = SAFFileHelper.editFile(context = getApplication(), fileUri = it, newFileName = noteTitle.value, newFileContent = noteContent.value) }
         fileUri.value?.let { _fileName.value = noteTitle.value }
-        setContent()
     }
 
     fun setContent() {
