@@ -4,6 +4,7 @@
     >
     <!-- Permissions -->
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+    <uses-permission android:name="com.android.vending.BILLING" />
 
     <!-- Application -->
     <application

@@ -3,6 +3,12 @@ package com.xectrone.quickmark.ui.theme
 object Constants {
     const val FILE_URI = "FILE_URI"
     const val SELECT_DIRECTORY_PATH_MSG = "Please go to Settings and select the note folder where you want to store your notes."
+    const val DONATION_MSG = "Hi, I’m xectrone, an independent developer passionate about creating productivity tools.\n" +
+            "\n" +
+            "I love building apps that save time, simplify workflows, and boost productivity. My vision is to continue developing apps full-time, especially in areas like note-taking, study helpers, and utility tools that make life easier for everyone.\n" +
+            "\n" +
+            "If you’ve enjoyed using QuickMark or would like to support my journey, your donation would mean the world to me. It helps me focus on creating more amazing features, maintaining the app, and developing new apps that bring value to users like you."
+
     object ExceptionToast{
         const val FILE_ALREADY_EXIST = "File with the same name already exists. Please choose a different name."
         const val GENERAL = "Something is wrong!"
@@ -11,6 +17,12 @@ object Constants {
         const val NO_VALID_FILE_NAME = "Invalid Title: Only letters, numbers, hyphens, underscores, spaces, and periods are allowed."
 
 
+    }
+
+    object Donation{
+        const val DONATION = "donation"
+        const val SUPPORT = "support"
+        const val THANKYOU = "thankyou"
     }
 
     object Toast{

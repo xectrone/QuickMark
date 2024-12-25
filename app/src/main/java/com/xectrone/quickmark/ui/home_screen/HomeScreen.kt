@@ -127,10 +127,21 @@ fun HomeScreen(
                         onClick =
                         {
                             viewModel.onClear()
+                            navController.navigate(Screen.Donation.route)
+                        }
+                    )
+                    { Icon(painterResource(id = R.drawable.round_volunteer_activism_24), contentDescription = Constants.Labels.HomeScreen.SETTINGS, tint = LocalCustomColorPalette.current.primary) }
+
+                    IconButton(
+                        onClick =
+                        {
+                            viewModel.onClear()
                             navController.navigate(Screen.Setting.route)
                         }
                     )
                     { Icon(imageVector = Icons.Rounded.Settings, contentDescription = Constants.Labels.HomeScreen.SETTINGS, tint = LocalCustomColorPalette.current.primary) }
+
+
                 },
 
                 elevation = Dimen.TopBar.elevation
