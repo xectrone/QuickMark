@@ -11,11 +11,15 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.QueryProductDetailsParams
 
 
+import android.widget.Toast
+import com.android.billingclient.api.ConsumeParams
+
 class BillingManager(
     private val context: Context,
     private val onPurchaseComplete: (Purchase) -> Unit
 ) {
     private lateinit var billingClient: BillingClient
+    private var isBillingClientReady = false
 
     fun setupBillingClient() {
         billingClient = BillingClient.newBuilder(context)
@@ -24,25 +28,63 @@ class BillingManager(
                     for (purchase in purchases) {
                         handlePurchase(purchase)
                     }
+                } else {
+                    Toast.makeText(context, "Purchase failed: ${billingResult.debugMessage}", Toast.LENGTH_LONG).show()
                 }
             }
             .enablePendingPurchases()
             .build()
 
+        connectBillingClient()
+    }
+
+    private fun connectBillingClient() {
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    // Billing client setup completed
+                    isBillingClientReady = true
+                    Toast.makeText(context, "Billing client setup completed.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Billing setup failed: ${billingResult.debugMessage}", Toast.LENGTH_LONG).show()
                 }
             }
 
             override fun onBillingServiceDisconnected() {
-                // Retry connection if needed
+                isBillingClientReady = false
+                Toast.makeText(context, "Billing service disconnected. Retrying...", Toast.LENGTH_SHORT).show()
+                retryConnection()
             }
         })
     }
 
+    private fun retryConnection() {
+        // Retry connection with exponential backoff
+        val maxRetries = 3
+        var retryCount = 0
+        val retryInterval = 2000L // 2 seconds
+
+        while (!isBillingClientReady && retryCount < maxRetries) {
+            try {
+                Thread.sleep(retryInterval)
+                connectBillingClient()
+                retryCount++
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+                break
+            }
+        }
+
+        if (!isBillingClientReady) {
+            Toast.makeText(context, "Failed to reconnect to billing service after $maxRetries attempts.", Toast.LENGTH_LONG).show()
+        }
+    }
+
     fun purchase(activity: Activity, productId: String) {
+        if (!isBillingClientReady) {
+            Toast.makeText(context, "Billing client is not ready. Cannot initiate purchase.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(
                 listOf(
@@ -67,25 +109,33 @@ class BillingManager(
                     )
                     .build()
                 billingClient.launchBillingFlow(activity, billingFlowParams)
+            } else {
+                Toast.makeText(context, "Failed to query product details: ${billingResult.debugMessage}", Toast.LENGTH_LONG).show()
             }
         }
     }
 
     private fun handlePurchase(purchase: Purchase) {
         if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-            // Acknowledge the purchase
-            val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
+            // Consume the purchase if it is a consumable item
+            val consumeParams = ConsumeParams.newBuilder()
                 .setPurchaseToken(purchase.purchaseToken)
                 .build()
-            billingClient.acknowledgePurchase(acknowledgePurchaseParams) { result ->
-                if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+            billingClient.consumeAsync(consumeParams) { billingResult, purchaseToken ->
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    Toast.makeText(context, "Purchase consumed successfully.", Toast.LENGTH_SHORT).show()
                     onPurchaseComplete(purchase)
+                } else {
+                    Toast.makeText(context, "Failed to consume purchase: ${billingResult.debugMessage}", Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
 
     fun release() {
-        billingClient.endConnection()
+        if (::billingClient.isInitialized) {
+            billingClient.endConnection()
+        }
     }
 }
+
