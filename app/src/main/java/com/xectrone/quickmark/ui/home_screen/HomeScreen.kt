@@ -149,7 +149,7 @@ fun HomeScreen(
 
         },
         floatingActionButton = {
-            if (directoryUri != null)
+            if (directoryUri != null && viewModel.hasFileAccessPermission())
             {
                 FloatingActionButton(
                     modifier = Modifier.padding(end = Dimen.Padding.p4, bottom = Dimen.Padding.p5),
@@ -171,31 +171,22 @@ fun HomeScreen(
 
     )
     {
-        val isValidDirectory = try {
-            directoryUri != null
-        } catch (e: Exception) {
-            false
-        }
-
-        if (isValidDirectory) {
+        if (directoryUri != null && viewModel.hasFileAccessPermission())
             LazyColumn(
                 modifier = Modifier
                     .padding(horizontal = Dimen.Padding.p4)
-            ) {
+            ){
                 //region - List View -
-                items(items = markdownFilesList, key = { it.fileName }) {
+                items(items = markdownFilesList, key ={it.fileName})
+                {
                     NoteListItem(
                         modifier = Modifier.animateItemPlacement(
                             animationSpec = tween(durationMillis = 600)
                         ),
-                        item = NoteSelectionListItem(
-                            fileName = it.fileName,
-                            fileContent = it.fileContent,
-                            fileUri = it.fileUri,
-                            lastModified = it.lastModified,
-                            isSelected = it.isSelected
-                        ),
-                        onClick = {
+                        item = NoteSelectionListItem(fileName = it.fileName, fileContent = it.fileContent, fileUri = it.fileUri, lastModified = it.lastModified, isSelected = it.isSelected),
+                        onClick =
+                        {
+
                             if (selectionMode)
                                 viewModel.onItemClick(it)
                             else
@@ -206,11 +197,8 @@ fun HomeScreen(
                 }
                 //endregion
             }
-        } else {
+        else
             MessageScreen(message = Constants.SELECT_DIRECTORY_PATH_MSG)
-        }
-
-
     }
 
     //region - Back Press Handler -

@@ -287,4 +287,11 @@ object SAFFileHelper {
         }
     }
 
+    fun hasFileAccessPermission(directoryUri: Uri, context: Context): Boolean {
+        val persistedUriPermissions = context.contentResolver.persistedUriPermissions
+        return persistedUriPermissions.any { it.isWritePermission && it.isReadPermission }
+    }
+
+
+
 }

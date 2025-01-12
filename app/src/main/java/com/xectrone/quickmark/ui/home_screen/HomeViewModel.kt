@@ -119,4 +119,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun is_path_set() = SAFFileHelper.is_path_set(directoryUri.value, getApplication())
 
+    fun hasFileAccessPermission():Boolean{
+        return if (directoryUri.value != null)
+            SAFFileHelper.hasFileAccessPermission(directoryUri.value!!, getApplication())
+        else
+            false
+
+    }
+
 }
