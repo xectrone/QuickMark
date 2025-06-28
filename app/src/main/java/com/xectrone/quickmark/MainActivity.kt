@@ -5,21 +5,23 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.xectrone.flashup.ui.theme.QuickMarkTheme
 import com.xectrone.quickmark.domain.billing.BillingManager
 import com.xectrone.quickmark.domain.navigation.HomeScreenNavGraph
-
+import androidx.compose.material3.*
+import androidx.navigation.compose.rememberNavController
+import com.xectrone.quickmark.ui.theme.QuickMarkTheme
+import androidx.core.view.WindowCompat
 
 class MainActivity : ComponentActivity() {
     private lateinit var billingManager: BillingManager
 
-    @OptIn(ExperimentalAnimationApi::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        // Setting Material 3 theme (defined in themes.xml)
         setTheme(R.style.Theme_QuickMark)
-
+        // Initialize BillingManager
         billingManager = BillingManager(
             context = this,
             onPurchaseComplete = {
@@ -27,10 +29,9 @@ class MainActivity : ComponentActivity() {
             }
         )
         billingManager.setupBillingClient()
-
         setContent {
             QuickMarkTheme {
-                val navController = rememberAnimatedNavController()
+                val navController = rememberNavController()
                 HomeScreenNavGraph(navController = navController, billingManager = billingManager)
             }
         }
@@ -41,6 +42,8 @@ class MainActivity : ComponentActivity() {
         billingManager.release()
     }
 }
+
+
 
 
 

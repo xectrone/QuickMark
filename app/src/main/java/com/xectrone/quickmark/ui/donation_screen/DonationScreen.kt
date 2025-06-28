@@ -1,3 +1,4 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package com.xectrone.quickmark.ui.donation_screen
 
 import android.annotation.SuppressLint
@@ -13,32 +14,33 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.xectrone.quickmark.data.DataStore.saveSelectedDirectoryUri
 import com.xectrone.quickmark.domain.billing.BillingManager
 import com.xectrone.quickmark.ui.add_note_dialog.add_note_dialog_shortcut.addHomeScreenShortcut
 import com.xectrone.quickmark.ui.theme.Constants
-import com.xectrone.quickmark.ui.theme.CustomShape
-import com.xectrone.quickmark.ui.theme.CustomTypography
 import com.xectrone.quickmark.ui.theme.Dimen
-import com.xectrone.quickmark.ui.theme.LocalCustomColorPalette
 import com.xectrone.quickmark.ui.utility.CustomOutlineButton
 import kotlinx.coroutines.launch
 
@@ -53,55 +55,76 @@ fun DonationScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        backgroundColor = LocalCustomColorPalette.current.background,
-
-        //region - Top Bar -
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                modifier = Modifier.padding(top = Dimen.Padding.statusBar),
-                backgroundColor = LocalCustomColorPalette.current.background,
-                contentColor = LocalCustomColorPalette.current.primary,
-                title = { Text(text = "", style = CustomTypography.h2, textAlign = TextAlign.Center) },
+                colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    navigationIconContentColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.primary
+                ),
+                title = { Text(text = "", style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = Constants.Labels.BACK)
                     }
-                },
-                elevation = Dimen.TopBar.elevation
+                }
             )
         }
-        //endregion
-    ) {
+    ) { innerPadding ->
         Column(
             modifier = Modifier
+                .padding(innerPadding)
                 .padding(Dimen.Padding.p4),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            //region - Note Folder -
-
-            Text(
-                modifier = Modifier.padding(bottom = Dimen.Padding.p4),
-                text = "SUPPORT",
-                style = CustomTypography.h2,
-                textAlign = TextAlign.Center,
-                color = LocalCustomColorPalette.current.primary
-            )
-
-            Text(
-                modifier = Modifier.padding(bottom = Dimen.Padding.p4),
-                text = Constants.DONATION_MSG,
-                style = CustomTypography.titleSecondary,
-                fontWeight = FontWeight.Normal,
-                textAlign = TextAlign.Center,
-                color = LocalCustomColorPalette.current.primary
-            )
-
+            // Card at the top
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = androidx.compose.material3.CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(Dimen.Padding.p3),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        modifier = Modifier.padding(vertical = Dimen.Padding.p3),
+                        text = "SUPPORT",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontSize = 30.sp,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Divider(
+                        modifier = Modifier.padding(vertical = 10.dp),
+                        color = MaterialTheme.colorScheme.outline,
+                        thickness = 1.dp
+                    )
+                    Text(
+                        modifier = Modifier.padding(vertical = Dimen.Padding.p3),
+                        text = Constants.DONATION_MSG,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+            // Main donation button
             CustomOutlineButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(Dimen.Padding.p3),
-                text = "Donation\n$7"
+                    .padding(vertical = Dimen.Padding.p4),
+                text1 = "DONATION",
+                text2 = "💌",
+                color = MaterialTheme.colorScheme.primary,
             ) {
                 scope.launch {
                     billingManager.purchase(
@@ -110,11 +133,10 @@ fun DonationScreen(
                     )
                 }
             }
-
+            // Row of two smaller buttons
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(Dimen.Padding.p3),
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
@@ -122,7 +144,9 @@ fun DonationScreen(
                     modifier = Modifier
                         .weight(1f)
                         .padding(end = Dimen.Padding.p3),
-                    text = "ThankYou\n$1"
+                    text1 = "THANK YOU",
+                    text2 = "☕",
+                    color = MaterialTheme.colorScheme.primary,
                 ) {
                     scope.launch {
                         billingManager.purchase(
@@ -131,12 +155,13 @@ fun DonationScreen(
                         )
                     }
                 }
-
                 CustomOutlineButton(
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = Dimen.Padding.p3),
-                    text = "Support\n$3"
+                    text1 = "SUPPORT",
+                    text2 = "🎁",
+                    color = MaterialTheme.colorScheme.primary,
                 ) {
                     scope.launch {
                         billingManager.purchase(

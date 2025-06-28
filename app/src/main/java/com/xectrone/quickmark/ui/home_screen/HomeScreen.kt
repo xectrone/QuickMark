@@ -1,3 +1,4 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package com.xectrone.quickmark.ui.home_screen
 
 import android.annotation.SuppressLint
@@ -8,15 +9,15 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Clear
@@ -38,10 +39,10 @@ import com.xectrone.quickmark.ui.theme.Dimen
 import com.xectrone.quickmark.R
 import com.xectrone.quickmark.domain.navigation.Screen
 import com.xectrone.quickmark.ui.theme.Constants
-import com.xectrone.quickmark.ui.theme.CustomTypography
 import com.xectrone.quickmark.ui.theme.LocalCustomColorPalette
 import com.xectrone.quickmark.ui.utility.MessageScreen
 import kotlinx.coroutines.delay
+import androidx.compose.foundation.layout.statusBarsPadding
 
 @OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -70,110 +71,89 @@ fun HomeScreen(
     }
 
     Scaffold(
-        backgroundColor = LocalCustomColorPalette.current.background,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar =
         {
             TopAppBar(
-                modifier = Modifier.padding(top = Dimen.Padding.statusBar),
-                backgroundColor = LocalCustomColorPalette.current.background,
-                contentColor = LocalCustomColorPalette.current.primary,
+                modifier = Modifier.statusBarsPadding(),
+                colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    navigationIconContentColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    actionIconContentColor = MaterialTheme.colorScheme.primary
+                ),
                 title =
                 {
-                    Text(text = stringResource(id = R.string.app_name), style =  CustomTypography.h2, color = LocalCustomColorPalette.current.primary)
+                    Text(
+                        text = stringResource(id = R.string.app_name),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 },
-
-//                navigationIcon = {
-//                    IconButton(
-//                        onClick =
-//                        {
-////                            scope.launch { scaffoldState.drawerState.open() }
-//                        }
-//                    )
-//                    { Icon(imageVector = Icons.Rounded.Menu, contentDescription = Constants.Labels.HomeScreen.MENU) }
-//                },
-                actions = @androidx.compose.runtime.Composable {
+                actions = {
                     if(selectionMode) {
                         IconButton(
                             onClick = { viewModel.onDelete() }
-                        )
-                        { Icon(imageVector = Icons.Rounded.Delete, contentDescription = Constants.Labels.HomeScreen.DELETE, tint = LocalCustomColorPalette.current.primary) }
-
+                        ) {
+                            Icon(imageVector = Icons.Rounded.Delete, contentDescription = Constants.Labels.HomeScreen.DELETE, tint = MaterialTheme.colorScheme.primary)
+                        }
                         IconButton(
                             onClick = { viewModel.onClear() }
-                        )
-                        { Icon(imageVector = Icons.Rounded.Clear, contentDescription = Constants.Labels.HomeScreen.CLEAR, tint = LocalCustomColorPalette.current.primary) }
-                    }
-                    IconButton(onClick = {viewModel.showMenu()})
-                    {
-                        Icon(painter = painterResource(id = R.drawable.round_sort_24), contentDescription = Constants.Labels.HomeScreen.SORT, tint = LocalCustomColorPalette.current.primary)
-                        DropdownMenu(expanded = isExpanded, onDismissRequest = { viewModel.hideMenu() })
-                        {
-                            DropdownMenuItem(onClick = { viewModel.onSort(SortOptions.nameASC) })
-                            { Text(text = Constants.Labels.SortOptions.nameASC) }
-
-                            DropdownMenuItem(onClick = { viewModel.onSort(SortOptions.nameDESC) })
-                            { Text(text = Constants.Labels.SortOptions.nameDESC) }
-
-                            DropdownMenuItem(onClick = { viewModel.onSort(SortOptions.lastModifiedASC) })
-                            { Text(text = Constants.Labels.SortOptions.lastModifiedASC) }
-
-                            DropdownMenuItem(onClick = { viewModel.onSort(SortOptions.lastModifiedDESC) })
-                            { Text(text = Constants.Labels.SortOptions.lastModifiedDESC) }
+                        ) {
+                            Icon(imageVector = Icons.Rounded.Clear, contentDescription = Constants.Labels.HomeScreen.CLEAR, tint = MaterialTheme.colorScheme.primary)
                         }
-
                     }
-
+                    IconButton(onClick = {viewModel.showMenu()}) {
+                        Icon(painter = painterResource(id = R.drawable.round_sort_24), contentDescription = Constants.Labels.HomeScreen.SORT, tint = MaterialTheme.colorScheme.primary)
+                        DropdownMenu(expanded = isExpanded, onDismissRequest = { viewModel.hideMenu() }) {
+                            DropdownMenuItem(text = { Text(text = Constants.Labels.SortOptions.nameASC) }, onClick = { viewModel.onSort(SortOptions.nameASC) })
+                            DropdownMenuItem(text = { Text(text = Constants.Labels.SortOptions.nameDESC) }, onClick = { viewModel.onSort(SortOptions.nameDESC) })
+                            DropdownMenuItem(text = { Text(text = Constants.Labels.SortOptions.lastModifiedASC) }, onClick = { viewModel.onSort(SortOptions.lastModifiedASC) })
+                            DropdownMenuItem(text = { Text(text = Constants.Labels.SortOptions.lastModifiedDESC) }, onClick = { viewModel.onSort(SortOptions.lastModifiedDESC) })
+                        }
+                    }
                     IconButton(
-                        onClick =
-                        {
+                        onClick = {
                             viewModel.onClear()
                             navController.navigate(Screen.Donation.route)
                         }
-                    )
-                    { Icon(painterResource(id = R.drawable.round_volunteer_activism_24), contentDescription = Constants.Labels.HomeScreen.SETTINGS, tint = LocalCustomColorPalette.current.primary) }
-
+                    ) {
+                        Icon(painterResource(id = R.drawable.round_volunteer_activism_24), contentDescription = Constants.Labels.HomeScreen.SETTINGS, tint = MaterialTheme.colorScheme.primary)
+                    }
                     IconButton(
-                        onClick =
-                        {
+                        onClick = {
                             viewModel.onClear()
                             navController.navigate(Screen.Setting.route)
                         }
-                    )
-                    { Icon(imageVector = Icons.Rounded.Settings, contentDescription = Constants.Labels.HomeScreen.SETTINGS, tint = LocalCustomColorPalette.current.primary) }
-
-
-                },
-
-                elevation = Dimen.TopBar.elevation
+                    ) {
+                        Icon(imageVector = Icons.Rounded.Settings, contentDescription = Constants.Labels.HomeScreen.SETTINGS, tint = MaterialTheme.colorScheme.primary)
+                    }
+                }
             )
-
         },
         floatingActionButton = {
-            if (directoryUri != null && viewModel.hasFileAccessPermission())
-            {
+            if (directoryUri != null && viewModel.hasFileAccessPermission()) {
                 FloatingActionButton(
                     modifier = Modifier.padding(end = Dimen.Padding.p4, bottom = Dimen.Padding.p5),
                     onClick = {
                         viewModel.onClear()
                         navController.navigate(Screen.AddEditNote.route)
                     },
-                    backgroundColor = MaterialTheme.colors.secondary
-                )
-                {
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.Add,
                         contentDescription = Constants.Labels.HomeScreen.ADD,
-                        tint = MaterialTheme.colors.background
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
         }
-
-    )
-    {
+    ) { innerPadding ->
         if (directoryUri != null && viewModel.hasFileAccessPermission())
             LazyColumn(
                 modifier = Modifier
+                    .padding(innerPadding)
                     .padding(horizontal = Dimen.Padding.p4)
             ){
                 //region - List View -

@@ -4,9 +4,9 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
 import com.xectrone.quickmark.domain.Util
 import com.xectrone.quickmark.domain.billing.BillingManager
 import com.xectrone.quickmark.ui.add_edit_note_screen.AddEditNoteScreen
@@ -19,7 +19,7 @@ import com.xectrone.quickmark.ui.theme.CustomAnimations
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeScreenNavGraph(navController: NavHostController, billingManager: BillingManager) {
-    AnimatedNavHost(navController = navController, startDestination = Screen.Home.route) {
+    NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
             HomeScreen(navController = navController)
         }

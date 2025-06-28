@@ -36,7 +36,11 @@ object Util
         )
     }
 
-    fun defaultFileName(): String = SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss", Locale.getDefault()).format(Date())
+    fun defaultFileName(): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss", Locale.getDefault())
+        sdf.timeZone = java.util.TimeZone.getDefault()
+        return sdf.format(Date())
+    }
 
     fun encodeUri(uri: Uri?):String {
         if (uri == null)

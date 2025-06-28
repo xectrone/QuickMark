@@ -1,53 +1,87 @@
 package com.xectrone.quickmark.ui.theme
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-object CustomTypography {
+object CustomTypography  {
 
-    val textPrimary = TextStyle(
+    @Composable
+
+    fun textPrimary(): TextStyle{
+        return TextStyle(
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
-//        letterSpacing = 1.25.sp
-    )
+//        letterSpacing = 1.25.sp,
+        color = LocalCustomColorPalette.current.primary
+        )
 
-    val textSecondary = TextStyle(
+    }
+
+
+    @Composable
+    fun textSecondary(): TextStyle{
+        return TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
-//        letterSpacing = 0.4.sp
-    )
+//        letterSpacing = 0.4.sp,
+        color = LocalCustomColorPalette.current.primary
+        )
 
-    val textTertiary = TextStyle(
+    }
+
+    @Composable
+    fun textTertiary(): TextStyle{
+        return TextStyle(
         fontWeight = FontWeight.Light,
         fontSize = 12.sp,
-//        letterSpacing = 1.5.sp
-    )
+//        letterSpacing = 1.5.sp,
+        color = LocalCustomColorPalette.current.primary
+        )
 
-    val h2 = TextStyle(
+    }
+
+    @Composable
+    fun h2(): TextStyle{
+        return TextStyle(
     fontWeight = FontWeight.Bold,
     fontSize = 20.sp,
-    letterSpacing = 0.15.sp
-    )
+    letterSpacing = 0.15.sp,
+        color = LocalCustomColorPalette.current.primary
+        )
 
-    val title = TextStyle(
+    }
+
+    @Composable
+    fun title(): TextStyle{
+        return TextStyle(
         fontWeight = FontWeight.Medium,
         fontSize = 20.sp,
-        letterSpacing = 0.15.sp
-    )
+        letterSpacing = 0.15.sp,
+        color = LocalCustomColorPalette.current.primary
+        )
+    }
 
-    val titleSecondary = TextStyle(
+    @Composable
+    fun titleSecondary(): TextStyle{
+        return TextStyle(
         fontWeight = FontWeight.Medium,
         fontSize = 18.sp,
-        letterSpacing = 0.15.sp
-    )
+        letterSpacing = 0.15.sp,
+        color = LocalCustomColorPalette.current.primary)
+    }
 
-
-    val body = TextStyle(
+    @Composable
+    fun body(): TextStyle{
+        return TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         letterSpacing = 0.5.sp,
-        lineHeight = 24.sp
-    )
+        lineHeight = 24.sp,
+        color = LocalCustomColorPalette.current.primary
+        )
+    }
+
 
 }
