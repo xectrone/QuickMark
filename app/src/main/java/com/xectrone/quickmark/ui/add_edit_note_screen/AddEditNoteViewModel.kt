@@ -34,6 +34,9 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
     private val _directoryUri = mutableStateOf<Uri?>(null)
     val directoryUri: State<Uri?> = _directoryUri
 
+    private val _isPinned = mutableStateOf<Boolean>(false)
+    val isPinned: State<Boolean> = _isPinned
+
     init {
         observeDirectoryUri()
     }
@@ -45,7 +48,6 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
             }
         }
     }
-
 
     fun onNoteContentChange(value:String){
         _noteContent.value = value
@@ -59,13 +61,34 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
             _isFileModified.value = fileUri.value?.let { SAFFileHelper.isFileModified(newFileName = noteTitle.value, newFileContent = noteContent.value, fileUri = it, context = getApplication())}?:false
     }
 
+    fun onPinnedChange(value: Boolean) {
+        _isPinned.value = value
+        if (!isNewNote.value)
+            _isFileModified.value = true
+    }
 
     fun onCreateNote(){
-        directoryUri.value?.let { SAFFileHelper.createFile(fileName = noteTitle.value, context = getApplication(), directoryUri = it, content = noteContent.value) }
+        directoryUri.value?.let { 
+            SAFFileHelper.createFile(
+                fileName = noteTitle.value, 
+                context = getApplication(), 
+                directoryUri = it, 
+                content = noteContent.value,
+                isPinned = isPinned.value
+            ) 
+        }
     }
 
     fun onEditNote(){
-        fileUri.value?.let { _fileUri.value = SAFFileHelper.editFile(context = getApplication(), fileUri = it, newFileName = noteTitle.value, newFileContent = noteContent.value) }
+        fileUri.value?.let { 
+            _fileUri.value = SAFFileHelper.editFile(
+                context = getApplication(), 
+                fileUri = it, 
+                newFileName = noteTitle.value, 
+                newFileContent = noteContent.value,
+                isPinned = isPinned.value
+            ) 
+        }
         fileUri.value?.let { _fileName.value = noteTitle.value }
     }
 
@@ -73,6 +96,7 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
         fileUri.value?.let {_noteContent.value = SAFFileHelper.getFileContent(fileUri = it, context = getApplication())}
         fileUri.value?.let {_noteTitle.value = SAFFileHelper.getFileName(fileUri = it,context = getApplication())}
         fileUri.value?.let {_fileName.value = SAFFileHelper.getFileName(fileUri = it,context = getApplication())}
+        fileUri.value?.let {_isPinned.value = SAFFileHelper.getPinnedStatus(fileUri = it, context = getApplication())}
         _isFileModified.value = false
     }
 

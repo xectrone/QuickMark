@@ -38,8 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -69,6 +67,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextDecoration
 
@@ -90,11 +89,6 @@ fun AddEditNoteScreen(
 
     val context = LocalContext.current
 
-    val focusRequester = remember { FocusRequester() }
-    val scrollState = rememberScrollState() // ScrollState to control scrolling
-    val bringIntoViewRequester = remember { BringIntoViewRequester() }
-    val coroutineScope = rememberCoroutineScope()
-
     // Local state for noteContent to prevent cursor jump
     var localNoteContent by rememberSaveable { mutableStateOf("") }
 
@@ -108,12 +102,6 @@ fun AddEditNoteScreen(
             viewModel.setFileUri(fileUri = fileUri.toString())
             viewModel.setContent()
             viewModel.toggleIsNewNote()
-        }
-    }
-    LaunchedEffect(Unit) {
-        if (isNewNote){
-            delay(200)
-            focusRequester.requestFocus()
         }
     }
 
@@ -188,7 +176,7 @@ fun AddEditNoteScreen(
                             }
                             else {
                                 viewModel.onEditNote()
-                                navController.navigateUp()
+                                Toast.makeText(context, "Note updated successfully", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -207,14 +195,15 @@ fun AddEditNoteScreen(
         //endregion
 
     ) { paddingValues ->
+
+        //region - Preview Mode -
         if (isPreviewMode) {
             // Live Markdown Preview Mode
             LazyColumn(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(horizontal = Dimen.Padding.p3)
-                    .imePadding(),
-                reverseLayout = true
+            modifier = Modifier
+                .padding(paddingValues)
+                .padding(horizontal = Dimen.Padding.p3)
+                    .imePadding()
             ) {
                 item {
                     // Beautiful Card with Rounded Corners
@@ -253,13 +242,13 @@ fun AddEditNoteScreen(
                             
                             // Markdown Content
                             val markdownContent = if (localNoteContent.isBlank()) {
-                                "# Test Markdown\n\nThis is a **test** of the markdown preview.\n\n- Item 1\n- Item 2\n\n*Italic text* and `code`"
+                                "Write here ..."
                             } else {
                                 localNoteContent
                             }
                             
                             // Simple Markdown Renderer
-        Column(
+                            Column(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 val lines = markdownContent.split("\n")
@@ -298,6 +287,36 @@ fun AddEditNoteScreen(
                                                 modifier = Modifier.padding(vertical = 4.dp)
                                             )
                                         }
+                                        line.startsWith("#### ") -> {
+                                            Text(
+                                                text = line.substring(5),
+                                                style = CustomTypography.title().copy(
+                                                    fontSize = 16.sp
+                                                ),
+                                                color = LocalCustomColorPalette.current.primary,
+                                                modifier = Modifier.padding(vertical = 4.dp)
+                                            )
+                                        }
+                                        line.startsWith("##### ") -> {
+                                            Text(
+                                                text = line.substring(6),
+                                                style = CustomTypography.title().copy(
+                                                    fontSize = 14.sp
+                                                ),
+                                                color = LocalCustomColorPalette.current.primary,
+                                                modifier = Modifier.padding(vertical = 4.dp)
+                                            )
+                                        }
+                                        line.startsWith("###### ") -> {
+                                            Text(
+                                                text = line.substring(7),
+                                                style = CustomTypography.title().copy(
+                                                    fontSize = 12.sp
+                                                ),
+                                                color = LocalCustomColorPalette.current.primary,
+                                                modifier = Modifier.padding(vertical = 4.dp)
+                                            )
+                                        }
                                         line == "---" -> {
                                             // Horizontal divider
                                             Divider(
@@ -307,36 +326,41 @@ fun AddEditNoteScreen(
                                             )
                                         }
                                         line.startsWith("- ") -> {
-                                            Row(
-                                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)
-                                            ) {
-                                                Text(
-                                                    text = "• ",
-                                                    style = CustomTypography.body(),
-                                                    color = LocalCustomColorPalette.current.primary
-                                                )
-                                                Text(
-                                                    text = renderInlineMarkdown(line.substring(2)),
-                                                    style = CustomTypography.body(),
-                                                    color = LocalCustomColorPalette.current.primary
-                                                )
-                                            }
+                                            renderListItem(line, "•")
                                         }
                                         line.startsWith("1. ") -> {
-                                            Row(
-                                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)
-                                            ) {
-                                                Text(
-                                                    text = "${i + 1}. ",
-                                                    style = CustomTypography.body(),
-                                                    color = LocalCustomColorPalette.current.primary
-                                                )
-                                                Text(
-                                                    text = renderInlineMarkdown(line.substring(3)),
-                                                    style = CustomTypography.body(),
-                                                    color = LocalCustomColorPalette.current.primary
-                                                )
-                                            }
+                                            renderListItem(line, "1.")
+                                        }
+                                        line.startsWith("2. ") -> {
+                                            renderListItem(line, "2.")
+                                        }
+                                        line.startsWith("3. ") -> {
+                                            renderListItem(line, "3.")
+                                        }
+                                        line.startsWith("4. ") -> {
+                                            renderListItem(line, "4.")
+                                        }
+                                        line.startsWith("5. ") -> {
+                                            renderListItem(line, "5.")
+                                        }
+                                        // Handle nested list items (indented)
+                                        line.trim().startsWith("- ") && line.startsWith(" ") -> {
+                                            renderListItem(line, "•")
+                                        }
+                                        line.trim().startsWith("1. ") && line.startsWith(" ") -> {
+                                            renderListItem(line, "1.")
+                                        }
+                                        line.trim().startsWith("2. ") && line.startsWith(" ") -> {
+                                            renderListItem(line, "2.")
+                                        }
+                                        line.trim().startsWith("3. ") && line.startsWith(" ") -> {
+                                            renderListItem(line, "3.")
+                                        }
+                                        line.trim().startsWith("4. ") && line.startsWith(" ") -> {
+                                            renderListItem(line, "4.")
+                                        }
+                                        line.trim().startsWith("5. ") && line.startsWith(" ") -> {
+                                            renderListItem(line, "5.")
                                         }
                                         line.trim().startsWith("```") -> {
                                             // Code block
@@ -422,51 +446,22 @@ fun AddEditNoteScreen(
                     }
                 }
             }
-        } else {
+        }
+        //endregion
+        else {
             // Edit Mode
-            LazyColumn(
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(horizontal = Dimen.Padding.p3)
-                    .imePadding(),
-                reverseLayout = true
-            ) {
-                item {
-                    TextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(focusRequester)
-                            .bringIntoViewRequester(bringIntoViewRequester)
-                            .onFocusChanged { focusState ->
-                                if (focusState.isFocused) {
-                                    coroutineScope.launch {
-                                        bringIntoViewRequester.bringIntoView()
-                                    }
-                                }
-                            },
-                        value = localNoteContent,
-                        onValueChange = { localNoteContent = it },
-                        textStyle = CustomTypography.body(),
-                        placeholder = {
-                            Text(
-                                text = "Write here...\n\n# Heading 1\n## Heading 2\n\n**Bold text**\n*Italic text*\n\n- List item 1\n- List item 2\n\n1. Numbered item 1\n2. Numbered item 2\n\n[Link text](https://example.com)\n\n`inline code`\n\n```\ncode block\n```\n\n```python\nprint('Hello')\n```",
-                                style = CustomTypography.body(),
-                                color = LocalCustomColorPalette.current.primary.copy(0.4f),
-                            )
-                        },
-                        colors = TextFieldDefaults.colors().copy(
-                            cursorColor = LocalCustomColorPalette.current.primary,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            errorIndicatorColor = Color.Red,
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent
-                        )
-                    )
-                }
-                item {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = Dimen.Padding.p3)
+                .imePadding(),
+                verticalArrangement = Arrangement.Top
+        ) {
+                // Title field - always at the top
             TextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 value = noteTitle,
                 onValueChange = { viewModel.onNoteTitleChange(it) },
                 textStyle = CustomTypography.title(),
@@ -494,7 +489,33 @@ fun AddEditNoteScreen(
                     }
                 }
             )
-                }
+
+//                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Content field in simple Column
+                TextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    value = localNoteContent,
+                    onValueChange = { localNoteContent = it },
+                    textStyle = CustomTypography.body(),
+                    placeholder = {
+                        Text(
+                            text = "Write here...",
+                            style = CustomTypography.body(),
+                            color = LocalCustomColorPalette.current.primary.copy(0.4f),
+                        )
+                    },
+                    colors = TextFieldDefaults.colors().copy(
+                        cursorColor = LocalCustomColorPalette.current.primary,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Red,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent
+                    )
+                )
             }
         }
     }
@@ -506,6 +527,32 @@ private fun renderInlineMarkdown(text: String): AnnotatedString {
         var currentIndex = 0
         while (currentIndex < text.length) {
             when {
+                // Bold and italic (*** or ___)
+                text.startsWith("***", currentIndex) -> {
+                    val endIndex = text.indexOf("***", currentIndex + 3)
+                    if (endIndex != -1) {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic)) {
+                            append(text.substring(currentIndex + 3, endIndex))
+                        }
+                        currentIndex = endIndex + 3
+                    } else {
+                        append(text[currentIndex])
+                        currentIndex++
+                    }
+                }
+                text.startsWith("___", currentIndex) -> {
+                    val endIndex = text.indexOf("___", currentIndex + 3)
+                    if (endIndex != -1) {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic)) {
+                            append(text.substring(currentIndex + 3, endIndex))
+                        }
+                        currentIndex = endIndex + 3
+                    } else {
+                        append(text[currentIndex])
+                        currentIndex++
+                    }
+                }
+                // Bold (** or __)
                 text.startsWith("**", currentIndex) -> {
                     val endIndex = text.indexOf("**", currentIndex + 2)
                     if (endIndex != -1) {
@@ -518,8 +565,33 @@ private fun renderInlineMarkdown(text: String): AnnotatedString {
                         currentIndex++
                     }
                 }
-                text.startsWith("*", currentIndex) && !text.startsWith("**", currentIndex) -> {
+                text.startsWith("__", currentIndex) -> {
+                    val endIndex = text.indexOf("__", currentIndex + 2)
+                    if (endIndex != -1) {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(text.substring(currentIndex + 2, endIndex))
+                        }
+                        currentIndex = endIndex + 2
+                    } else {
+                        append(text[currentIndex])
+                        currentIndex++
+                    }
+                }
+                // Italic (* or _)
+                text.startsWith("*", currentIndex) && !text.startsWith("**", currentIndex) && !text.startsWith("***", currentIndex) -> {
                     val endIndex = text.indexOf("*", currentIndex + 1)
+                    if (endIndex != -1 && endIndex != currentIndex + 1) {
+                        withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
+                            append(text.substring(currentIndex + 1, endIndex))
+                        }
+                        currentIndex = endIndex + 1
+                    } else {
+                        append(text[currentIndex])
+                        currentIndex++
+                    }
+                }
+                text.startsWith("_", currentIndex) && !text.startsWith("__", currentIndex) && !text.startsWith("___", currentIndex) -> {
+                    val endIndex = text.indexOf("_", currentIndex + 1)
                     if (endIndex != -1 && endIndex != currentIndex + 1) {
                         withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
                             append(text.substring(currentIndex + 1, endIndex))
@@ -560,5 +632,32 @@ private fun renderInlineMarkdown(text: String): AnnotatedString {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun renderListItem(line: String, prefix: String) {
+    // Calculate indentation level based on leading spaces
+    val leadingSpaces = line.takeWhile { it == ' ' }.length
+    val indentLevel = leadingSpaces / 2 // Assuming 2 spaces per indent level
+    
+    val contentStart = if (prefix == "•") 2 else 3
+    val content = line.substring(contentStart).trim()
+    val indentDp = (16 + indentLevel * 16).dp
+    
+    Row(
+        modifier = Modifier
+            .padding(horizontal = indentDp, vertical = 2.dp)
+    ) {
+        Text(
+            text = "$prefix ",
+            style = CustomTypography.body(),
+            color = LocalCustomColorPalette.current.primary
+        )
+        Text(
+            text = renderInlineMarkdown(content),
+            style = CustomTypography.body(),
+            color = LocalCustomColorPalette.current.primary
+        )
     }
 }

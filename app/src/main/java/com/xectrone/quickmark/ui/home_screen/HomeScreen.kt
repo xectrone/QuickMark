@@ -20,9 +20,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Delete
+
+import androidx.compose.material.icons.rounded.Clear
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,6 +59,7 @@ fun HomeScreen(
     val directoryUri by viewModel.directoryUri
 
     val isExpanded by viewModel.isExpanded
+    var showMoreMenu by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     var backPressHandled by remember { mutableStateOf(true) }
@@ -91,18 +95,7 @@ fun HomeScreen(
                     )
                 },
                 actions = {
-                    if(selectionMode) {
-                        IconButton(
-                            onClick = { viewModel.onDelete() }
-                        ) {
-                            Icon(imageVector = Icons.Rounded.Delete, contentDescription = Constants.Labels.HomeScreen.DELETE, tint = MaterialTheme.colorScheme.primary)
-                        }
-                        IconButton(
-                            onClick = { viewModel.onClear() }
-                        ) {
-                            Icon(imageVector = Icons.Rounded.Clear, contentDescription = Constants.Labels.HomeScreen.CLEAR, tint = MaterialTheme.colorScheme.primary)
-                        }
-                    }
+                    // Sort menu (always visible)
                     IconButton(onClick = {viewModel.showMenu()}) {
                         Icon(painter = painterResource(id = R.drawable.round_sort_24), contentDescription = Constants.Labels.HomeScreen.SORT, tint = MaterialTheme.colorScheme.primary)
                         DropdownMenu(expanded = isExpanded, onDismissRequest = { viewModel.hideMenu() }) {
@@ -112,6 +105,7 @@ fun HomeScreen(
                             DropdownMenuItem(text = { Text(text = Constants.Labels.SortOptions.lastModifiedDESC) }, onClick = { viewModel.onSort(SortOptions.lastModifiedDESC) })
                         }
                     }
+
                     IconButton(
                         onClick = {
                             viewModel.onClear()
@@ -127,6 +121,71 @@ fun HomeScreen(
                         }
                     ) {
                         Icon(imageVector = Icons.Rounded.Settings, contentDescription = Constants.Labels.HomeScreen.SETTINGS, tint = MaterialTheme.colorScheme.primary)
+                    }
+                    
+                    // Three-dot menu (only show when in selection mode, positioned after settings)
+                    if(selectionMode) {
+                        IconButton(onClick = { showMoreMenu = true }) {
+                            Icon(imageVector = Icons.Rounded.MoreVert, contentDescription = "More options", tint = MaterialTheme.colorScheme.primary)
+                            DropdownMenu(expanded = showMoreMenu, onDismissRequest = { showMoreMenu = false }) {
+                                DropdownMenuItem(
+                                    text = { Text("Pin") },
+                                    leadingIcon = { 
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.round_push_pin_24),
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    },
+                                    onClick = {
+                                        viewModel.onPinSelected()
+                                        showMoreMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Delete") },
+                                    leadingIcon = { 
+                                        Icon(
+                                            imageVector = Icons.Rounded.Delete,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    },
+                                    onClick = {
+                                        viewModel.onDelete()
+                                        showMoreMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Select All") },
+                                    leadingIcon = { 
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.round_select_all_24),
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    },
+                                    onClick = {
+                                        viewModel.onSelectAll()
+                                        showMoreMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Deselect All") },
+                                    leadingIcon = { 
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.round_deselect_24),
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    },
+                                    onClick = {
+                                        viewModel.onDeselectAll()
+                                        showMoreMenu = false
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             )
@@ -157,22 +216,22 @@ fun HomeScreen(
                     .padding(horizontal = Dimen.Padding.p4)
             ){
                 //region - List View -
-                items(items = markdownFilesList, key ={it.fileName})
-                {
+                items(
+                    items = markdownFilesList, 
+                    key = { it.fileUri.toString() + it.isPinned.toString() }
+                ) { item ->
                     NoteListItem(
                         modifier = Modifier.animateItemPlacement(
-                            animationSpec = tween(durationMillis = 600)
+                            animationSpec = tween(durationMillis = 200)
                         ),
-                        item = NoteSelectionListItem(fileName = it.fileName, fileContent = it.fileContent, fileUri = it.fileUri, lastModified = it.lastModified, isSelected = it.isSelected),
-                        onClick =
-                        {
-
+                        item = item,
+                        onClick = {
                             if (selectionMode)
-                                viewModel.onItemClick(it)
+                                viewModel.onItemClick(item)
                             else
-                                navController.navigate(route = Screen.AddEditNote.navArg(it.fileUri))
+                                navController.navigate(route = Screen.AddEditNote.navArg(item.fileUri))
                         },
-                        onLongClick = { viewModel.onItemLongClick(it) },
+                        onLongClick = { viewModel.onItemLongClick(item) }
                     )
                 }
                 //endregion

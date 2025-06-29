@@ -23,4 +23,31 @@ object DataStore {
         val prefs = context.getSharedPreferences("QuickMarkPrefs", Context.MODE_PRIVATE)
         return prefs.getInt("selected_sort_option", 0)
     }
+
+    // Pinned notes management
+    fun savePinnedNoteIds(context: Context, pinnedIds: Set<String>) {
+        val prefs = context.getSharedPreferences("QuickMarkPrefs", Context.MODE_PRIVATE)
+        prefs.edit().putStringSet("pinned_note_ids", pinnedIds).apply()
+    }
+
+    fun getPinnedNoteIds(context: Context): Set<String> {
+        val prefs = context.getSharedPreferences("QuickMarkPrefs", Context.MODE_PRIVATE)
+        return prefs.getStringSet("pinned_note_ids", emptySet()) ?: emptySet()
+    }
+
+    fun addPinnedNoteId(context: Context, noteId: String) {
+        val currentPinnedIds = getPinnedNoteIds(context).toMutableSet()
+        currentPinnedIds.add(noteId)
+        savePinnedNoteIds(context, currentPinnedIds)
+    }
+
+    fun removePinnedNoteId(context: Context, noteId: String) {
+        val currentPinnedIds = getPinnedNoteIds(context).toMutableSet()
+        currentPinnedIds.remove(noteId)
+        savePinnedNoteIds(context, currentPinnedIds)
+    }
+
+    fun isNotePinned(context: Context, noteId: String): Boolean {
+        return getPinnedNoteIds(context).contains(noteId)
+    }
 }

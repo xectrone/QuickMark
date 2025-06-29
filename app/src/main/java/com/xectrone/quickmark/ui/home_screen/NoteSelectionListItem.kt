@@ -8,5 +8,6 @@ data class NoteSelectionListItem(
     val fileContent: String,
     val lastModified: LocalDateTime,
     val fileUri: Uri,
-    val isSelected: Boolean = false
+    val isSelected: Boolean = false,
+    val isPinned: Boolean = false
 )

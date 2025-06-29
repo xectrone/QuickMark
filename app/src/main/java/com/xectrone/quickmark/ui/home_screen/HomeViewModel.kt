@@ -61,14 +61,31 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     suspend fun refreshMarkdownFiles() {
         directoryUri.value?.let{uri ->
-            _markdownFilesList.value = when(sortOption.value){
-                SortOptions.nameASC -> SAFFileHelper.getMarkdownFilesFromDirectory(directoryUri = uri, context = getApplication()).sortedBy { it.fileName }
-                SortOptions.nameDESC -> SAFFileHelper.getMarkdownFilesFromDirectory(directoryUri = uri, context = getApplication()).sortedBy { it.fileName }.reversed()
-                SortOptions.lastModifiedASC -> SAFFileHelper.getMarkdownFilesFromDirectory(directoryUri = uri, context = getApplication()).sortedBy { it.lastModified }
-                SortOptions.lastModifiedDESC -> SAFFileHelper.getMarkdownFilesFromDirectory(directoryUri = uri, context = getApplication()).sortedBy { it.lastModified }.reversed()
-                else -> SAFFileHelper.getMarkdownFilesFromDirectory(directoryUri = uri, context = getApplication()).sortedBy { it.lastModified }.reversed()
+            val files = SAFFileHelper.getMarkdownFilesFromDirectory(directoryUri = uri, context = getApplication())
+            
+            // Separate pinned and unpinned notes
+            val pinnedNotes = files.filter { it.isPinned }
+            val unpinnedNotes = files.filter { !it.isPinned }
+            
+            // Sort pinned and unpinned notes separately
+            val sortedPinnedNotes = when(sortOption.value){
+                SortOptions.nameASC -> pinnedNotes.sortedBy { it.fileName.lowercase() }
+                SortOptions.nameDESC -> pinnedNotes.sortedByDescending { it.fileName.lowercase() }
+                SortOptions.lastModifiedASC -> pinnedNotes.sortedBy { it.lastModified }
+                SortOptions.lastModifiedDESC -> pinnedNotes.sortedByDescending { it.lastModified }
+                else -> pinnedNotes.sortedByDescending { it.lastModified }
             }
-
+            
+            val sortedUnpinnedNotes = when(sortOption.value){
+                SortOptions.nameASC -> unpinnedNotes.sortedBy { it.fileName.lowercase() }
+                SortOptions.nameDESC -> unpinnedNotes.sortedByDescending { it.fileName.lowercase() }
+                SortOptions.lastModifiedASC -> unpinnedNotes.sortedBy { it.lastModified }
+                SortOptions.lastModifiedDESC -> unpinnedNotes.sortedByDescending { it.lastModified }
+                else -> unpinnedNotes.sortedByDescending { it.lastModified }
+            }
+            
+            // Combine pinned notes first, then unpinned notes
+            _markdownFilesList.value = sortedPinnedNotes + sortedUnpinnedNotes
         }
     }
 
@@ -78,6 +95,36 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             refreshMarkdownFiles()
         }
         _selectionMode.value = false
+    }
+
+    fun onSelectAll() {
+        _markdownFilesList.value = markdownFilesList.value.map { it.copy(isSelected = true) }
+        _selectionMode.value = true
+    }
+
+    fun onDeselectAll() {
+        _markdownFilesList.value = markdownFilesList.value.map { it.copy(isSelected = false) }
+        _selectionMode.value = false
+    }
+
+    fun onPinSelected() {
+        viewModelScope.launch {
+            val selectedItems = markdownFilesList.value.filter { it.isSelected }
+            var success = true
+            for (item in selectedItems) {
+                val itemSuccess = SAFFileHelper.togglePinnedStatus(item.fileUri, getApplication())
+                if (!itemSuccess) {
+                    success = false
+                }
+            }
+            if (success) {
+                refreshMarkdownFiles()
+                // Clear selection after pinning
+                _selectionMode.value = false
+            } else {
+                Toast.makeText(getApplication(), "Failed to update some pinned statuses", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     fun onItemClick(item: NoteSelectionListItem) {
@@ -115,6 +162,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun hideMenu(){
         _isExpanded.value = false
+    }
+
+    // Toggle pinned status for a note
+    fun togglePinnedStatus(item: NoteSelectionListItem) {
+        viewModelScope.launch {
+            val success = SAFFileHelper.togglePinnedStatus(item.fileUri, getApplication())
+            if (success) {
+                refreshMarkdownFiles()
+            } else {
+                Toast.makeText(getApplication(), "Failed to update pinned status", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     fun is_path_set() = SAFFileHelper.is_path_set(directoryUri.value, getApplication())

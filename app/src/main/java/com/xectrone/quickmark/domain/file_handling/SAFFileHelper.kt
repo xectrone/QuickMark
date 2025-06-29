@@ -6,6 +6,7 @@ import android.net.Uri
 import android.provider.DocumentsContract
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
+import com.xectrone.quickmark.data.DataStore
 import com.xectrone.quickmark.ui.home_screen.NoteSelectionListItem
 import com.xectrone.quickmark.ui.theme.Constants
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,14 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 object SAFFileHelper {
+    // Metadata key for pinned status
+    private const val PINNED_METADATA_KEY = "pinned"
+    
+    // Generate a unique note ID based on file URI
+    private fun getNoteId(fileUri: Uri): String {
+        return fileUri.toString()
+    }
+    
     // Get all markdown files in the given directory
     fun getAllMarkdownFiles(directoryUri: Uri, context: Context): List<Uri> {
         val markdownFiles = mutableListOf<Uri>()
@@ -49,7 +58,7 @@ object SAFFileHelper {
         return markdownFiles
     }
 
-    fun createFile(fileName: String, content: String, directoryUri: Uri, context: Context) {
+    fun createFile(fileName: String, content: String, directoryUri: Uri, context: Context, isPinned: Boolean = false) {
         // Ensure the new file name has the ".md" extension
         val newFileNameWithExtension = if (fileName.endsWith(".md", ignoreCase = true)) {
             fileName.trim()
@@ -75,6 +84,12 @@ object SAFFileHelper {
             contentResolver.openOutputStream(newFileUri, "w")?.use { outputStream ->
                 outputStream.write(content.toByteArray())
             }
+            
+            // Set pinned status if needed
+            if (isPinned) {
+                val noteId = getNoteId(newFileUri)
+                DataStore.addPinnedNoteId(context, noteId)
+            }
         } catch (e: Exception) {
             Toast.makeText(context, "Failed to write content: ${e.message}", Toast.LENGTH_SHORT).show()
             // Clean up by deleting the newly created file
@@ -82,7 +97,7 @@ object SAFFileHelper {
         }
     }
 
-    fun editFile(newFileName: String, newFileContent: String, fileUri: Uri, context: Context): Uri? {
+    fun editFile(newFileName: String, newFileContent: String, fileUri: Uri, context: Context, isPinned: Boolean? = null): Uri? {
         val contentResolver = context.contentResolver
 
         // Get current file name without the extension
@@ -105,6 +120,16 @@ object SAFFileHelper {
             contentResolver.openOutputStream(updatedUri, "wt")?.use { outputStream ->
                 outputStream.write(newFileContent.toByteArray())
             }
+            
+            // Update pinned status if provided
+            isPinned?.let { pinned ->
+                val noteId = getNoteId(updatedUri)
+                if (pinned) {
+                    DataStore.addPinnedNoteId(context, noteId)
+                } else {
+                    DataStore.removePinnedNoteId(context, noteId)
+                }
+            }
         } catch (e: Exception) {
             Toast.makeText(context, "Failed to write content: ${e.message}", Toast.LENGTH_SHORT).show()
             return null
@@ -113,6 +138,25 @@ object SAFFileHelper {
         return updatedUri
     }
 
+    // Get pinned status for a file using DataStore
+    fun getPinnedStatus(fileUri: Uri, context: Context): Boolean {
+        val noteId = getNoteId(fileUri)
+        return DataStore.isNotePinned(context, noteId)
+    }
+
+    // Toggle pinned status for a file using DataStore
+    fun togglePinnedStatus(fileUri: Uri, context: Context): Boolean {
+        val noteId = getNoteId(fileUri)
+        val isCurrentlyPinned = DataStore.isNotePinned(context, noteId)
+        
+        if (isCurrentlyPinned) {
+            DataStore.removePinnedNoteId(context, noteId)
+        } else {
+            DataStore.addPinnedNoteId(context, noteId)
+        }
+        
+        return true
+    }
 
     fun deleteFile(fileUri: Uri, context: Context): Boolean {
         return try {
@@ -229,6 +273,7 @@ object SAFFileHelper {
                 if (displayName.endsWith(".md", ignoreCase = true)) {
                     val fileUri = DocumentsContract.buildDocumentUriUsingTree(directoryUri, documentId)
                     val fileContent = getFileContent(fileUri, context)
+                    val isPinned = getPinnedStatus(fileUri, context)
 
                     // Convert last modified time to LocalDateTime
                     val lastModified = LocalDateTime.ofEpochSecond(lastModifiedMillis / 1000, 0, ZoneOffset.UTC)
@@ -238,7 +283,8 @@ object SAFFileHelper {
                         fileName = displayName.substringBeforeLast(".md"),
                         fileContent = fileContent,
                         lastModified = lastModified,
-                        fileUri = fileUri
+                        fileUri = fileUri,
+                        isPinned = isPinned
                     )
                     markdownFiles.add(note)
                 }
@@ -291,7 +337,5 @@ object SAFFileHelper {
         val persistedUriPermissions = context.contentResolver.persistedUriPermissions
         return persistedUriPermissions.any { it.isWritePermission && it.isReadPermission }
     }
-
-
 
 }

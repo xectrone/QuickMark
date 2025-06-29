@@ -3,7 +3,7 @@
 
     <style name="Theme.QuickMark" parent="android:Theme.Material.NoActionBar" >
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowLightStatusBar">true</item>
+<!--        <item name="android:windowLightStatusBar">true</item>-->
 
     </style>
 
