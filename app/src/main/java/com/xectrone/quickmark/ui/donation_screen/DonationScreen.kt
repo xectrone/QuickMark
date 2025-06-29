@@ -40,7 +40,9 @@ import com.xectrone.quickmark.data.DataStore.saveSelectedDirectoryUri
 import com.xectrone.quickmark.domain.billing.BillingManager
 import com.xectrone.quickmark.ui.add_note_dialog.add_note_dialog_shortcut.addHomeScreenShortcut
 import com.xectrone.quickmark.ui.theme.Constants
+import com.xectrone.quickmark.ui.theme.CustomColorPalette
 import com.xectrone.quickmark.ui.theme.Dimen
+import com.xectrone.quickmark.ui.theme.LocalCustomColorPalette
 import com.xectrone.quickmark.ui.utility.CustomOutlineButton
 import kotlinx.coroutines.launch
 
@@ -55,13 +57,13 @@ fun DonationScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = LocalCustomColorPalette.current.background,
         topBar = {
             TopAppBar(
                 colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    navigationIconContentColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.primary
+                    containerColor = LocalCustomColorPalette.current.background,
+                    navigationIconContentColor = LocalCustomColorPalette.current.primary,
+                    titleContentColor = LocalCustomColorPalette.current.primary
                 ),
                 title = { Text(text = "", style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center) },
                 navigationIcon = {
@@ -85,8 +87,8 @@ fun DonationScreen(
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = androidx.compose.material3.CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.primary
+                    containerColor = LocalCustomColorPalette.current.surface,
+                    contentColor = LocalCustomColorPalette.current.primary
                 )
             ) {
                 Column(
@@ -100,11 +102,11 @@ fun DonationScreen(
                         style = MaterialTheme.typography.titleLarge,
                         fontSize = 30.sp,
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.primary
+                        color = LocalCustomColorPalette.current.accentSecondary
                     )
                     Divider(
                         modifier = Modifier.padding(vertical = 10.dp),
-                        color = MaterialTheme.colorScheme.outline,
+                        color = LocalCustomColorPalette.current.tertiary,
                         thickness = 1.dp
                     )
                     Text(
@@ -113,7 +115,7 @@ fun DonationScreen(
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Normal,
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.primary
+                        color = LocalCustomColorPalette.current.primary
                     )
                 }
             }
@@ -124,7 +126,7 @@ fun DonationScreen(
                     .padding(vertical = Dimen.Padding.p4),
                 text1 = "DONATION",
                 text2 = "💌",
-                color = MaterialTheme.colorScheme.primary,
+                color = LocalCustomColorPalette.current.background,
             ) {
                 scope.launch {
                     billingManager.purchase(
@@ -146,7 +148,7 @@ fun DonationScreen(
                         .padding(end = Dimen.Padding.p3),
                     text1 = "THANK YOU",
                     text2 = "☕",
-                    color = MaterialTheme.colorScheme.primary,
+                    color = LocalCustomColorPalette.current.background,
                 ) {
                     scope.launch {
                         billingManager.purchase(
@@ -161,7 +163,7 @@ fun DonationScreen(
                         .padding(start = Dimen.Padding.p3),
                     text1 = "SUPPORT",
                     text2 = "🎁",
-                    color = MaterialTheme.colorScheme.primary,
+                    color = LocalCustomColorPalette.current.background,
                 ) {
                     scope.launch {
                         billingManager.purchase(

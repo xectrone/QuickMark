@@ -32,7 +32,7 @@ fun CustomOutlineButton(
         modifier = modifier,
         border = BorderStroke(width = 1.dp, color = color),
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = LocalCustomColorPalette.current.accentSecondary,
             contentColor = color
         ),
         onClick = { onClick() },

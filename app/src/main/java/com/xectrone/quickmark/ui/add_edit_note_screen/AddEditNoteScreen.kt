@@ -77,6 +77,7 @@ import androidx.compose.ui.text.style.TextDecoration
 fun AddEditNoteScreen(
     fileUri: Uri?,
     navController: NavController,
+    sharedText: String? = null,
     viewModel: AddEditNoteViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val noteTitle by viewModel.noteTitle
@@ -95,6 +96,14 @@ fun AddEditNoteScreen(
     // Sync localNoteContent with ViewModel only when fileUri or isNewNote changes
     LaunchedEffect(fileUri, isNewNote) {
         localNoteContent = viewModel.noteContent.value
+    }
+
+    // Handle shared text - pre-populate content if shared text is provided
+    LaunchedEffect(sharedText) {
+        if (sharedText != null && localNoteContent.isEmpty()) {
+            localNoteContent = sharedText
+            viewModel.onNoteContentChange(sharedText)
+        }
     }
 
     LaunchedEffect(fileUri){

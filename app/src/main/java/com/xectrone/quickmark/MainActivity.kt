@@ -1,5 +1,6 @@
 package com.xectrone.quickmark
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -29,11 +30,30 @@ class MainActivity : ComponentActivity() {
             }
         )
         billingManager.setupBillingClient()
+        
+        // Handle share intent
+        val sharedText = handleShareIntent(intent)
+        
         setContent {
             QuickMarkTheme {
                 val navController = rememberNavController()
-                HomeScreenNavGraph(navController = navController, billingManager = billingManager)
+                HomeScreenNavGraph(
+                    navController = navController, 
+                    billingManager = billingManager,
+                    sharedText = sharedText
+                )
             }
+        }
+    }
+
+    private fun handleShareIntent(intent: Intent): String? {
+        return when (intent.action) {
+            Intent.ACTION_SEND -> {
+                if (intent.type == "text/plain") {
+                    intent.getStringExtra(Intent.EXTRA_TEXT)
+                } else null
+            }
+            else -> null
         }
     }
 

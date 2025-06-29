@@ -2,6 +2,7 @@ package com.xectrone.quickmark.domain.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -18,7 +19,11 @@ import com.xectrone.quickmark.ui.theme.CustomAnimations
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun HomeScreenNavGraph(navController: NavHostController, billingManager: BillingManager) {
+fun HomeScreenNavGraph(
+    navController: NavHostController, 
+    billingManager: BillingManager,
+    sharedText: String? = null
+) {
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
             HomeScreen(navController = navController)
@@ -47,7 +52,8 @@ fun HomeScreenNavGraph(navController: NavHostController, billingManager: Billing
         ) {
             AddEditNoteScreen(
                 fileUri = Util.decodeUri(it.arguments!!.getString(FILE_URI)!!),
-                navController = navController
+                navController = navController,
+                sharedText = sharedText
             )
         }
 
@@ -60,6 +66,15 @@ fun HomeScreenNavGraph(navController: NavHostController, billingManager: Billing
             popExitTransition = { CustomAnimations.slideOutHorizontally() },
         ) {
             DonationScreen(navController = navController, billingManager = billingManager)
+        }
+    }
+    
+    // Handle shared text by navigating to add note screen
+    LaunchedEffect(sharedText) {
+        if (sharedText != null) {
+            navController.navigate(Screen.AddEditNote.navArg(null)) {
+                popUpTo(Screen.Home.route) { inclusive = false }
+            }
         }
     }
 }
