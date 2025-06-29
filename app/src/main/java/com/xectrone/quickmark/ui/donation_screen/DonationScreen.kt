@@ -3,11 +3,6 @@ package com.xectrone.quickmark.ui.donation_screen
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Intent
-import android.net.Uri
-import android.provider.DocumentsContract
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,11 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.xectrone.quickmark.data.DataStore.saveSelectedDirectoryUri
 import com.xectrone.quickmark.domain.billing.BillingManager
-import com.xectrone.quickmark.ui.add_note_dialog.add_note_dialog_shortcut.addHomeScreenShortcut
 import com.xectrone.quickmark.ui.theme.Constants
-import com.xectrone.quickmark.ui.theme.CustomColorPalette
 import com.xectrone.quickmark.ui.theme.Dimen
 import com.xectrone.quickmark.ui.theme.LocalCustomColorPalette
 import com.xectrone.quickmark.ui.utility.CustomOutlineButton
