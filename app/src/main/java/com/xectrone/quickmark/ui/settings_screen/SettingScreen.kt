@@ -1,6 +1,7 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package com.xectrone.quickmark.ui.settings_screen
 
+import addHomeScreenShortcut
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
@@ -31,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.xectrone.quickmark.data.DataStore.saveSelectedDirectoryUri
-import com.xectrone.quickmark.ui.add_note_dialog.add_note_dialog_shortcut.addHomeScreenShortcut
 import com.xectrone.quickmark.ui.theme.Constants
 import com.xectrone.quickmark.ui.theme.CustomShape
 import com.xectrone.quickmark.ui.theme.Dimen

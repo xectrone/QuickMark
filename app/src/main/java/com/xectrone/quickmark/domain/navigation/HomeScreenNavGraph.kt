@@ -22,7 +22,8 @@ import com.xectrone.quickmark.ui.theme.CustomAnimations
 fun HomeScreenNavGraph(
     navController: NavHostController, 
     billingManager: BillingManager,
-    sharedText: String? = null
+    sharedText: String? = null,
+    openAddNote: Boolean = false
 ) {
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
@@ -70,8 +71,12 @@ fun HomeScreenNavGraph(
     }
     
     // Handle shared text by navigating to add note screen
-    LaunchedEffect(sharedText) {
-        if (sharedText != null) {
+    LaunchedEffect(sharedText, openAddNote) {
+        if (openAddNote) {
+            navController.navigate(Screen.AddEditNote.navArg(null)) {
+                popUpTo(Screen.Home.route) { inclusive = false }
+            }
+        } else if (sharedText != null) {
             navController.navigate(Screen.AddEditNote.navArg(null)) {
                 popUpTo(Screen.Home.route) { inclusive = false }
             }

@@ -1,5 +1,7 @@
 package com.xectrone.quickmark.ui.add_note_dialog.add_note_dialog_tile
 
+import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.drawable.Icon
 import android.os.Build
@@ -11,6 +13,7 @@ import com.xectrone.quickmark.R
 import com.xectrone.quickmark.ui.add_note_dialog.AddNoteActivity
 
 class AddNoteDialogService : TileService() {
+    @SuppressLint("StartActivityAndCollapseDeprecated")
     override fun onClick() {
         super.onClick()
 
@@ -18,7 +21,15 @@ class AddNoteDialogService : TileService() {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
         try {
-            startActivityAndCollapse(intent)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                val pendingIntent = PendingIntent.getActivity(
+                    this, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                )
+                startActivityAndCollapse(pendingIntent) //
+            } else {
+                @Suppress("DEPRECATION")
+                startActivityAndCollapse(intent) //
+            }
         } catch (exception: UnsupportedOperationException) {
             try {
                 startActivity(intent)
