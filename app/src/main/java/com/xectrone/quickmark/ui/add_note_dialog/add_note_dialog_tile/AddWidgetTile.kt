@@ -3,9 +3,9 @@ package com.xectrone.quickmark.ui.add_note_dialog.add_note_dialog_tile
 import android.content.Intent
 import android.graphics.drawable.Icon
 import android.os.Build
-
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.xectrone.quickmark.R
 import com.xectrone.quickmark.ui.add_note_dialog.AddNoteActivity
@@ -13,10 +13,19 @@ import com.xectrone.quickmark.ui.add_note_dialog.AddNoteActivity
 class AddNoteDialogService : TileService() {
     override fun onClick() {
         super.onClick()
-        // Set up click action
+
         val intent = Intent(this, AddNoteActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivityAndCollapse(intent)
+
+        try {
+            startActivityAndCollapse(intent)
+        } catch (exception: UnsupportedOperationException) {
+            try {
+                startActivity(intent)
+            } catch (_: Exception) {
+                Toast.makeText(this, "Unable to open QuickMark from Quick Settings", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

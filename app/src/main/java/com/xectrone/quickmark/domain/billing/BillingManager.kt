@@ -2,17 +2,14 @@ package com.xectrone.quickmark.domain.billing
 
 import android.app.Activity
 import android.content.Context
-import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.QueryProductDetailsParams
-
-
 import android.widget.Toast
-import com.android.billingclient.api.ConsumeParams
 
 class BillingManager(
     private val context: Context,
@@ -20,15 +17,33 @@ class BillingManager(
 ) {
     private lateinit var billingClient: BillingClient
     private var isBillingClientReady = false
+    private var hasStartedBillingSetup = false
 
-    fun setupBillingClient() {
+    companion object {
+        fun shouldShowUserFacingError(responseCode: Int): Boolean {
+            return when (responseCode) {
+                BillingClient.BillingResponseCode.SERVICE_UNAVAILABLE,
+                BillingClient.BillingResponseCode.BILLING_UNAVAILABLE,
+                BillingClient.BillingResponseCode.DEVELOPER_ERROR,
+                BillingClient.BillingResponseCode.ERROR -> true
+                else -> false
+            }
+        }
+    }
+
+    private fun setupBillingClient() {
+        if (hasStartedBillingSetup) {
+            return
+        }
+        hasStartedBillingSetup = true
+
         billingClient = BillingClient.newBuilder(context)
             .setListener { billingResult, purchases ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
                     for (purchase in purchases) {
                         handlePurchase(purchase)
                     }
-                } else {
+                } else if (shouldShowUserFacingError(billingResult.responseCode)) {
                     Toast.makeText(context, "Purchase failed: ${billingResult.debugMessage}", Toast.LENGTH_LONG).show()
                 }
             }
@@ -43,15 +58,13 @@ class BillingManager(
             override fun onBillingSetupFinished(billingResult: BillingResult) {
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     isBillingClientReady = true
-                    Toast.makeText(context, "Billing client setup completed.", Toast.LENGTH_SHORT).show()
-                } else {
+                } else if (shouldShowUserFacingError(billingResult.responseCode)) {
                     Toast.makeText(context, "Billing setup failed: ${billingResult.debugMessage}", Toast.LENGTH_LONG).show()
                 }
             }
 
             override fun onBillingServiceDisconnected() {
                 isBillingClientReady = false
-                Toast.makeText(context, "Billing service disconnected. Retrying...", Toast.LENGTH_SHORT).show()
                 retryConnection()
             }
         })
@@ -75,13 +88,14 @@ class BillingManager(
         }
 
         if (!isBillingClientReady) {
-            Toast.makeText(context, "Failed to reconnect to billing service after $maxRetries attempts.", Toast.LENGTH_LONG).show()
+            // No toast here: reconnect attempts are expected and should not appear as random errors.
         }
     }
 
     fun purchase(activity: Activity, productId: String) {
         if (!isBillingClientReady) {
-            Toast.makeText(context, "Billing client is not ready. Cannot initiate purchase.", Toast.LENGTH_SHORT).show()
+            setupBillingClient()
+            Toast.makeText(context, "Billing is starting. Please try again in a moment.", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -109,7 +123,7 @@ class BillingManager(
                     )
                     .build()
                 billingClient.launchBillingFlow(activity, billingFlowParams)
-            } else {
+            } else if (shouldShowUserFacingError(billingResult.responseCode)) {
                 Toast.makeText(context, "Failed to query product details: ${billingResult.debugMessage}", Toast.LENGTH_LONG).show()
             }
         }
@@ -123,9 +137,8 @@ class BillingManager(
                 .build()
             billingClient.consumeAsync(consumeParams) { billingResult, purchaseToken ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    Toast.makeText(context, "Purchase consumed successfully.", Toast.LENGTH_SHORT).show()
                     onPurchaseComplete(purchase)
-                } else {
+                } else if (shouldShowUserFacingError(billingResult.responseCode)) {
                     Toast.makeText(context, "Failed to consume purchase: ${billingResult.debugMessage}", Toast.LENGTH_LONG).show()
                 }
             }

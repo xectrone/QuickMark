@@ -29,7 +29,8 @@ class MainActivity : ComponentActivity() {
                 Toast.makeText(this, "Thank you for your support!", Toast.LENGTH_LONG).show()
             }
         )
-        billingManager.setupBillingClient()
+        // Billing is initialized lazily when the user actually starts a purchase flow.
+        // This avoids noisy background toasts during normal app use.
         
         // Handle share intent
         val sharedText = handleShareIntent(intent)
