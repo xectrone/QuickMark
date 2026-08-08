@@ -2,14 +2,17 @@ package com.xectrone.quickmark.ui.add_edit_note_screen
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.xectrone.quickmark.domain.Util
-import com.xectrone.quickmark.data.DataStore.getSavedDirectoryUri
 import com.xectrone.quickmark.domain.file_handling.SAFFileHelper
+import com.xectrone.quickmark.domain.file_handling.SAFStorageManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AddEditNoteViewModel(application: Application): AndroidViewModel(application) {
 
@@ -43,8 +46,24 @@ class AddEditNoteViewModel(application: Application): AndroidViewModel(applicati
 
     private fun observeDirectoryUri() {
         viewModelScope.launch {
-            getSavedDirectoryUri(getApplication())?.let{ uri ->
+            val context = getApplication<Application>()
+            val uri = SAFStorageManager.getDirectoryUri(context)
+
+            if (uri == null) {
+                // No directory chosen yet — _directoryUri stays null
+                return@launch
+            }
+
+            val isValid = withContext(Dispatchers.IO) {
+                SAFStorageManager.isDirectoryValid(context, uri)
+            }
+
+            if (isValid) {
                 _directoryUri.value = uri
+            } else {
+                Log.w("AddEditNoteViewModel", "Stored URI is stale — not assigning to avoid crash")
+                // Do not assign; directoryUri stays null.
+                // Note creation is guarded by directoryUri?.let{} so it will silently no-op.
             }
         }
     }

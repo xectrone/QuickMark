@@ -2,18 +2,21 @@ package com.xectrone.quickmark.ui.home_screen
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.xectrone.quickmark.data.DataStore.getSavedDirectoryUri
 import com.xectrone.quickmark.data.DataStore.getSavedSort
 import com.xectrone.quickmark.data.DataStore.saveSelectedSort
 import com.xectrone.quickmark.domain.file_handling.SAFFileHelper
+import com.xectrone.quickmark.domain.file_handling.SAFStorageManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -39,11 +42,33 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun observeDirectoryUri() {
         viewModelScope.launch {
-            getSavedDirectoryUri(getApplication())?.let{ uri ->
+            val context = getApplication<Application>()
+            val uri = SAFStorageManager.getDirectoryUri(context)
+
+            if (uri == null) {
+                // No directory has been chosen yet
+                _directoryUri.value = null
+                return@launch
+            }
+
+            // Validate on a background thread (SAF query can be slow)
+            val isValid = withContext(Dispatchers.IO) {
+                SAFStorageManager.isDirectoryValid(context, uri)
+            }
+
+            if (isValid) {
                 _directoryUri.value = uri
-                uri?.let {
-                    refreshMarkdownFiles()
+                refreshMarkdownFiles()
+            } else {
+                Log.w("HomeViewModel", "Stored URI is stale — clearing and redirecting to setup")
+                // Release permission and clear the stale URI
+                withContext(Dispatchers.IO) {
+                    SAFStorageManager.releasePermission(context, uri)
                 }
+                SAFStorageManager.clearDirectoryUri(context)
+                // Reset UI state — HomeScreen shows "Select Directory" automatically
+                _directoryUri.value = null
+                _markdownFilesList.value = emptyList()
             }
         }
     }
@@ -178,12 +203,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun is_path_set() = SAFFileHelper.is_path_set(directoryUri.value, getApplication())
 
-    fun hasFileAccessPermission():Boolean{
-        return if (directoryUri.value != null)
-            SAFFileHelper.hasFileAccessPermission(directoryUri.value!!, getApplication())
-        else
-            false
-
+    fun hasFileAccessPermission(): Boolean {
+        val uri = directoryUri.value ?: return false
+        return SAFStorageManager.isPermissionPersisted(getApplication(), uri)
     }
 
 }

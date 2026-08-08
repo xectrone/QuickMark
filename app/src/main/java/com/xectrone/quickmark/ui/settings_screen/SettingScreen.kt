@@ -31,7 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
-import com.xectrone.quickmark.data.DataStore.saveSelectedDirectoryUri
+import com.xectrone.quickmark.domain.file_handling.SAFStorageManager
 import com.xectrone.quickmark.ui.theme.Constants
 import com.xectrone.quickmark.ui.theme.CustomShape
 import com.xectrone.quickmark.ui.theme.Dimen
@@ -55,7 +55,7 @@ fun SettingsScreen(
 
                 scope.launch {
                     val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(uri, DocumentsContract.getTreeDocumentId(uri))
-                    saveSelectedDirectoryUri(context, childrenUri)
+                    SAFStorageManager.saveDirectoryUri(context, childrenUri)
                 }
             }
         }

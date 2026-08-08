@@ -9,6 +9,11 @@ object DataStore {
         prefs.edit().putString("selected_directory_uri", uri.toString()).apply()
     }
 
+    fun clearDirectoryUri(context: Context) {
+        val prefs = context.getSharedPreferences("QuickMarkPrefs", Context.MODE_PRIVATE)
+        prefs.edit().remove("selected_directory_uri").apply()
+    }
+
     fun getSavedDirectoryUri(context: Context): Uri? {
         val prefs = context.getSharedPreferences("QuickMarkPrefs", Context.MODE_PRIVATE)
         return prefs.getString("selected_directory_uri", null)?.let { Uri.parse(it) }

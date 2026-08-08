@@ -30,32 +30,33 @@ object SAFFileHelper {
     
     // Get all markdown files in the given directory
     fun getAllMarkdownFiles(directoryUri: Uri, context: Context): List<Uri> {
-        val markdownFiles = mutableListOf<Uri>()
-
-        val contentResolver: ContentResolver = context.contentResolver
-        val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
-            directoryUri,
-            DocumentsContract.getTreeDocumentId(directoryUri)
-        )
-
-        val cursor = contentResolver.query(childrenUri, arrayOf(
-            DocumentsContract.Document.COLUMN_DOCUMENT_ID,
-            DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-            DocumentsContract.Document.COLUMN_MIME_TYPE
-        ), null, null, null)
-
-        cursor?.use {
-            while (it.moveToNext()) {
-                val displayName = it.getString(1)
-                val mimeType = it.getString(2)
-
-                if (mimeType == "text/markdown" || displayName.endsWith(".md")) {
-                    val fileUri = Uri.parse("${directoryUri.toString().removeSuffix("/children")}%2F$displayName")
-                    markdownFiles.add(fileUri)
+        return try {
+            val markdownFiles = mutableListOf<Uri>()
+            val contentResolver: ContentResolver = context.contentResolver
+            val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
+                directoryUri,
+                DocumentsContract.getTreeDocumentId(directoryUri)
+            )
+            val cursor = contentResolver.query(childrenUri, arrayOf(
+                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                DocumentsContract.Document.COLUMN_MIME_TYPE
+            ), null, null, null)
+            cursor?.use {
+                while (it.moveToNext()) {
+                    val displayName = it.getString(1)
+                    val mimeType = it.getString(2)
+                    if (mimeType == "text/markdown" || displayName.endsWith(".md")) {
+                        val fileUri = Uri.parse("${directoryUri.toString().removeSuffix("/children")}%2F$displayName")
+                        markdownFiles.add(fileUri)
+                    }
                 }
             }
+            markdownFiles
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
         }
-        return markdownFiles
     }
 
     fun createFile(fileName: String, content: String, directoryUri: Uri, context: Context, isPinned: Boolean = false) {
@@ -218,8 +219,13 @@ object SAFFileHelper {
     }
 
     fun getFileName(fileUri: Uri, context: Context): String {
-        val documentFile = DocumentFile.fromSingleUri(context, fileUri)
-        return documentFile?.name?.substringBeforeLast(".md") ?: ""
+        return try {
+            val documentFile = DocumentFile.fromSingleUri(context, fileUri)
+            documentFile?.name?.substringBeforeLast(".md") ?: ""
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ""
+        }
     }
 
     fun getFileContent(fileUri: Uri, context: Context): String {
@@ -246,52 +252,57 @@ object SAFFileHelper {
 
     suspend fun getMarkdownFilesFromDirectory(directoryUri: Uri, context: Context): List<NoteSelectionListItem> = withContext(
         Dispatchers.IO) {
-        val contentResolver = context.contentResolver
-        val markdownFiles = mutableListOf<NoteSelectionListItem>()
+        return@withContext try {
+            val contentResolver = context.contentResolver
+            val markdownFiles = mutableListOf<NoteSelectionListItem>()
 
-        // Query to get the list of documents in the directory
-        val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
-            directoryUri,
-            DocumentsContract.getTreeDocumentId(directoryUri)
-        )
+            // Query to get the list of documents in the directory
+            val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
+                directoryUri,
+                DocumentsContract.getTreeDocumentId(directoryUri)
+            )
 
-        val cursor = contentResolver.query(
-            childrenUri,
-            arrayOf(DocumentsContract.Document.COLUMN_DOCUMENT_ID, DocumentsContract.Document.COLUMN_DISPLAY_NAME, DocumentsContract.Document.COLUMN_LAST_MODIFIED),
-            null,
-            null,
-            null
-        )
+            val cursor = contentResolver.query(
+                childrenUri,
+                arrayOf(DocumentsContract.Document.COLUMN_DOCUMENT_ID, DocumentsContract.Document.COLUMN_DISPLAY_NAME, DocumentsContract.Document.COLUMN_LAST_MODIFIED),
+                null,
+                null,
+                null
+            )
 
-        cursor?.use {
-            while (it.moveToNext()) {
-                val documentId = it.getString(it.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DOCUMENT_ID))
-                val displayName = it.getString(it.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME))
-                val lastModifiedMillis = it.getLong(it.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_LAST_MODIFIED))
+            cursor?.use {
+                while (it.moveToNext()) {
+                    val documentId = it.getString(it.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DOCUMENT_ID))
+                    val displayName = it.getString(it.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME))
+                    val lastModifiedMillis = it.getLong(it.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_LAST_MODIFIED))
 
-                // Check if the file is a markdown file
-                if (displayName.endsWith(".md", ignoreCase = true)) {
-                    val fileUri = DocumentsContract.buildDocumentUriUsingTree(directoryUri, documentId)
-                    val fileContent = getFileContent(fileUri, context)
-                    val isPinned = getPinnedStatus(fileUri, context)
+                    // Check if the file is a markdown file
+                    if (displayName.endsWith(".md", ignoreCase = true)) {
+                        val fileUri = DocumentsContract.buildDocumentUriUsingTree(directoryUri, documentId)
+                        val fileContent = getFileContent(fileUri, context)
+                        val isPinned = getPinnedStatus(fileUri, context)
 
-                    // Convert last modified time to LocalDateTime
-                    val lastModified = LocalDateTime.ofEpochSecond(lastModifiedMillis / 1000, 0, ZoneOffset.UTC)
+                        // Convert last modified time to LocalDateTime
+                        val lastModified = LocalDateTime.ofEpochSecond(lastModifiedMillis / 1000, 0, ZoneOffset.UTC)
 
-                    // Create the NoteSelectionListItem object
-                    val note = NoteSelectionListItem(
-                        fileName = displayName.substringBeforeLast(".md"),
-                        fileContent = fileContent,
-                        lastModified = lastModified,
-                        fileUri = fileUri,
-                        isPinned = isPinned
-                    )
-                    markdownFiles.add(note)
+                        // Create the NoteSelectionListItem object
+                        val note = NoteSelectionListItem(
+                            fileName = displayName.substringBeforeLast(".md"),
+                            fileContent = fileContent,
+                            lastModified = lastModified,
+                            fileUri = fileUri,
+                            isPinned = isPinned
+                        )
+                        markdownFiles.add(note)
+                    }
                 }
             }
-        }
 
-        return@withContext markdownFiles
+            markdownFiles
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
     }
 
     suspend fun deleteSelectedFiles(
@@ -331,11 +342,6 @@ object SAFFileHelper {
             Toast.makeText(context, Constants.SELECT_DIRECTORY_PATH_MSG, Toast.LENGTH_SHORT).show()
             return false
         }
-    }
-
-    fun hasFileAccessPermission(directoryUri: Uri, context: Context): Boolean {
-        val persistedUriPermissions = context.contentResolver.persistedUriPermissions
-        return persistedUriPermissions.any { it.isWritePermission && it.isReadPermission }
     }
 
 }

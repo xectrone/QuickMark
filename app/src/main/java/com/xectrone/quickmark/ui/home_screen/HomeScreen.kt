@@ -191,7 +191,7 @@ fun HomeScreen(
             )
         },
         floatingActionButton = {
-            if (directoryUri != null && viewModel.hasFileAccessPermission()) {
+            if (directoryUri != null) {
                 FloatingActionButton(
                     modifier = Modifier.padding(end = Dimen.Padding.p4, bottom = Dimen.Padding.p5),
                     onClick = {
@@ -209,7 +209,7 @@ fun HomeScreen(
             }
         }
     ) { innerPadding ->
-        if (directoryUri != null && viewModel.hasFileAccessPermission())
+        if (directoryUri != null)
             LazyColumn(
                 modifier = Modifier
                     .padding(innerPadding)
